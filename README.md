@@ -10,3 +10,4 @@
 # Running
 
 - `npm run dev` : Build and launch app on localhost.
+- `npm run dev:fb` : Build and launch app on localhost with Firebase emulators.

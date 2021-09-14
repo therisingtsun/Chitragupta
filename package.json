@@ -3,8 +3,10 @@
 		"build": "npm run clean && webpack --env production",
 		"clean": "rimraf public/*",
 		"dev": "concurrently --kill-others \"webpack\" \"npm run serve\"",
-		"serve": "browser-sync public --watch --single --port 8080",
-		"postinstall": "node .scripts/postinstall.js"
+		"dev:fb": "concurrently --kill-others \"webpack\" \"firebase emulators:start\" \"npm run serve:fb\"",
+		"serve": "browser-sync public --watch --single --port 3000",
+		"serve:fb": "browser-sync start --watch --files public --port 3000 --proxy localhost:5000",
+		"postinstall": "npm run build"
 	},
 	"name": "chitragupta",
 	"version": "1.0.0",
@@ -29,7 +31,6 @@
 		"css-loader": "^6.2.0",
 		"cssnano": "^5.0.8",
 		"firebase-tools": "^9.18.0",
-		"mini-css-extract-plugin": "^2.3.0",
 		"postcss": "^8.3.6",
 		"postcss-loader": "^6.1.1",
 		"rimraf": "^3.0.2",
