@@ -1,15 +1,11 @@
 # Pre-requisites
 
-- NodeJS
-	- Install from [here](https://nodejs.org/en/).
-
-- Firebase CLI
-	- Run `npm i -g firebase-tools` to install the Firebase CLI.
-	- Run `firebase login` to log into Firebase.
+- NodeJS : Install from [here](https://nodejs.org/en/).
 
 # Installation
 
-Run `npm i` to install dependencies.
+- `npm i` : Install dependencies.
+- `firebase login` : Login to Firebase.
 
 # Running
 
