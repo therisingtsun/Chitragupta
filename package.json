@@ -14,7 +14,6 @@
 	"author": "ROG.stdioh",
 	"private": true,
 	"dependencies": {
-		"@uiw/react-codemirror": "^3.2.1",
 		"codemirror": "^5.62.3",
 		"dompurify": "^2.3.1",
 		"highlight.js": "^11.2.0",
