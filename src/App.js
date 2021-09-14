@@ -1,24 +1,60 @@
-import React, { Component } from "react";
-import { Route, Switch } from "react-router-dom";
+import React from "react";
+
 import "./App.scss";
+import Preview from "./Preview";
 
-class App extends Component {
-	render() {
-		return (
-			<Switch>
-				<Route path="/test">
-					<div className="App">
-						<h1> Henlo worldo! </h1>
-					</div>
-				</Route>
-				<Route path="/">
-					<div className="App">
-						<h1> Henlo… </h1>
-					</div>
-				</Route>
-			</Switch>
-		);
-	}
+import "codemirror/mode/markdown/markdown";
+import "./theme-dark.css";
+
+import CodeMirror from "./CodeMirror";
+
+const sample = `
+# Henlo worldo!
+
+**bold**
+_italics_
+~~strike~~
+<div id="idName">;-;</div>
+
+\`\`\`ts
+const x = 'lul';
+function (mlep: string) {
+	return "fook" + mlep;
 }
+\`\`\`
+\`\`\`cpp
+#include <iostream>
 
-export default App;
+int main() {
+	cout << "Henlo World!";
+	return 0;
+}
+\`\`\`
+\`\`\`py
+import math
+
+print(math.floor(102.111))
+\`\`\`
+`;
+
+export default function App() {
+	return (
+		<div className="App">
+			<CodeMirror
+				value={sample}
+				options={{
+					mode: "markdown",
+					theme: "theme-dark",
+					indentUnit: 4,
+					indentWithTabs: true,
+					tabSize: 4,
+					lineWrapping: true,
+				}}
+				onChange={(value, viewUpdate) => {
+					console.log(value);
+				}}
+			/>
+			<Preview value={sample} />
+		</div>
+	);
+}
