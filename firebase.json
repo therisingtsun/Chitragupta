@@ -4,7 +4,7 @@
 		"source": "functions"
 	},
 	"hosting": {
-		"public": "functions/public",
+		"public": "public",
 		"ignore": [
 			"firebase.json",
 			"**/.*",
@@ -13,16 +13,13 @@
 		"rewrites": [
 			{
 				"source": "**",
-				"function": "ssr"
+				"destination": "/index.html"
 			}
 		]
 	},
 	"emulators": {
 		"auth": {
 			"port": 9099
-		},
-		"functions": {
-			"port": 5001
 		},
 		"firestore": {
 			"port": 8080

@@ -12,12 +12,21 @@ module.exports = (env) => {
 		{
 			mode,
 			watch,
-			entry: "./src/index.prod.js",
+			target: "web",
+			entry: "./src/index.js",
+			devServer: {
+				static: {
+					directory: path.resolve(__dirname, "public")
+				},
+				compress: true,
+				port: 8080,
+				hot: true,
+			},
 			resolve: {
 				extensions: ["*", ".js", ".jsx"]
 			},
 			output: {
-				path: path.resolve(__dirname, "functions/public/"),
+				path: path.resolve(__dirname, "public/"),
 				filename: "index.js"
 			},
 			module: {
@@ -36,6 +45,7 @@ module.exports = (env) => {
 			}
 		}, {
 			mode,
+			watch,
 			plugins: [
 				new MiniCssExtractPlugin({
 					filename: "index.css"
@@ -44,16 +54,15 @@ module.exports = (env) => {
 					patterns: [
 						{
 							from: path.resolve(__dirname, "src/views/index.html"),
-							to: path.resolve(__dirname, "functions/src/views/")
+							to: path.resolve(__dirname, "public/")
 						},
 						{
 							from: path.resolve(__dirname, "src/styles/__compiled/index.css"),
-							to: path.resolve(__dirname, "functions/public/")
+							to: path.resolve(__dirname, "public/")
 						}
 					],
 				})
 			],
-			watch,
 			entry: "./src/styles/index.scss",
 			output: {
 				path: path.resolve(__dirname, "src/styles/__compiled/"),

@@ -1,14 +1,10 @@
 {
 	"scripts": {
-		"build": "npm run babel && webpack --env production",
-		"babel": "babel src -d functions/src && babel index.js -d functions",
-		"babel:server": "babel -w index.js -d functions",
-		"babel:src": "babel -w src -d functions/src",
-		"browser": "browser-sync start --watch --files functions --port 3000 --proxy http://localhost:5000 --reload-delay 500",
-		"browser:dev": "browser-sync dist --watch --single --port 3000",
-		"dev": "rimraf dist/* && concurrently --kill-others \"webpack --config webpack.config.dev.js\" \"npm run browser:dev\"",
-		"dev:emulated": "concurrently --kill-others \"npm run babel:src\" \"npm run babel:server\" \"webpack\" \"firebase emulators:start\" \"npm run browser\"",
-		"postinstall": "cd functions && npm install"
+		"build": "npm run clean && webpack --env production",
+		"clean": "rimraf public/*",
+		"dev": "concurrently --kill-others \"webpack\" \"npm run serve\"",
+		"serve": "browser-sync public --watch --single --port 8080",
+		"postinstall": "node .scripts/postinstall.js"
 	},
 	"name": "chitragupta",
 	"version": "1.0.0",
@@ -40,6 +36,7 @@
 		"sass-loader": "^12.1.0",
 		"style-loader": "^3.2.1",
 		"webpack": "^5.52.1",
-		"webpack-cli": "^4.8.0"
+		"webpack-cli": "^4.8.0",
+		"webpack-dev-server": "^4.2.1"
 	}
 }
