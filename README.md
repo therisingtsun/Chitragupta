@@ -13,5 +13,4 @@ Run `npm i` to install dependencies.
 
 # Running
 
-- `npm run dev` : Build and launch app on localhost (Non SSR version).
-- `npm run dev:emulated` : Build and launch app on Firebase emulators (SSR version).
+- `npm run dev` : Build and launch app on localhost.
