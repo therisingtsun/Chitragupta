@@ -51,7 +51,7 @@ export default function App() {
 					lineWrapping: true,
 				}}
 				onChange={(value, viewUpdate) => {
-					console.log(value);
+					// setText(value.getValue());
 				}}
 			/>
 			<Preview value={sample} />
