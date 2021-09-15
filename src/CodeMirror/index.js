@@ -1,7 +1,7 @@
-import React, { useRef, useEffect, useImperativeHandle, useState, useMemo } from 'react';
-import CodeMirror from 'codemirror';
-import 'codemirror/mode/meta';
-import './base.css';
+import React, { useRef, useEffect, useImperativeHandle, useState, useMemo } from "react";
+import CodeMirror from "codemirror";
+import "codemirror/mode/meta";
+import "./base.css";
 
 const defaultOptions = {
 	tabSize: 4,
@@ -13,7 +13,7 @@ const defaultOptions = {
 }
 
 function ReactCodeMirror(props = {}, ref) {
-	const { options = {}, value = '' } = props;
+	const { options = {}, value = "" } = props;
 	const [editor, setEditor] = useState();
 	const textareaRef = useRef();
 	const lastestProps = useRef(props);
@@ -39,8 +39,8 @@ function ReactCodeMirror(props = {}, ref) {
 	}
 
 	function setOptions(instance, opt = {}) {
-		if (typeof opt === 'object' && window) {
-			const mode = CodeMirror.findModeByName(opt.mode || '');
+		if (typeof opt === "object" && window) {
+			const mode = CodeMirror.findModeByName(opt.mode || "");
 			if (mode) {
 				opt.mode = mode.mime;
 			}
@@ -59,7 +59,7 @@ function ReactCodeMirror(props = {}, ref) {
 			Object.keys(eventDict).forEach((event) => {
 				instance.on(eventDict[event], (...params) => lastestProps.current[event](...params));
 			});
-			instance.setValue(value || '');
+			instance.setValue(value || "");
 
 			setEditor(instance);
 			setOptions(instance, { ...defaultOptions, ...options });
