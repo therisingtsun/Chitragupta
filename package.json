@@ -10,7 +10,7 @@
 	},
 	"name": "chitragupta",
 	"version": "1.0.0",
-	"description": "An app for taking notes. (WIP)",
+	"description": "An app for taking notes.",
 	"author": "ROG.stdioh",
 	"private": true,
 	"dependencies": {
