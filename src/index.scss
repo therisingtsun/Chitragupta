@@ -1,0 +1,36 @@
+body {
+	background-color: #09141d;
+}
+
+/* webkit */
+*::-webkit-scrollbar {
+	width: 0.5rem;
+	height: 0.5rem;
+}
+
+*::-webkit-scrollbar-track {
+	background-color: #ffffff10;
+
+	&:hover {
+		background-color: #ffffff20;
+	}
+}
+
+*::-webkit-scrollbar-thumb {
+	background-color: #abb5e2;
+	border-radius: 0.5rem;
+
+	&:hover {
+		background-color: #dde3fd;
+	}
+}
+
+*::-webkit-scrollbar-corner {
+	background-color: transparent;
+}
+
+/* Standard—Firefox and future browsers. */
+* {
+	scrollbar-color: #dde3fd #ffffff10;
+	scrollbar-width: thin;
+}
