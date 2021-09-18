@@ -312,7 +312,7 @@ hello world hii
 			<div>
 				<button
 					onClick={() => {
-						transformer(toggleBold);
+						wordTransformer(toggleBold);
 					}}
 				>
 					BOLD
