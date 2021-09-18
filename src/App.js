@@ -95,16 +95,14 @@ hello world hii
 		editor.replaceSelection(transformedLine);
 		let updatedContentOfLine = editor.getLine(positionOfCursor.line);
 
-		const isFormatted = checkIfFormatted(
+		const lengthDifference = getLengthDifference(
 			contentOfLine.length,
 			updatedContentOfLine.length
 		);
 
-		modifyPostTransformCursorPos(config, isFormatted);
 		cursorPlacementForLineTransform(
 			editor,
-			config,
-			isFormatted,
+			lengthDifference,
 			positionOfCursor
 		);
 		setFocusOnEditor(editor);
@@ -202,21 +200,24 @@ hello world hii
 		}
 	}
 
+	function getLengthDifference(prevLen, postLen) {
+		return prevLen - postLen;
+	}
+
 	function cursorPlacementForLineTransform(
 		editor,
-		config,
-		formatted,
+		lengthDifference,
 		positionOfCursor
 	) {
-		if (formatted || config.onlyForward) {
+		if (lengthDifference < 0) {
 			editor.setCursor(
 				positionOfCursor.line,
-				positionOfCursor.ch + config.postTransformCursorPos
+				positionOfCursor.ch - lengthDifference
 			);
 		} else {
 			editor.setCursor(
 				positionOfCursor.line,
-				positionOfCursor.ch - config.postTransformCursorPos
+				positionOfCursor.ch - lengthDifference
 			);
 		}
 	}
@@ -255,15 +256,15 @@ hello world hii
 		postTransformCursorPos: 2,
 	};
 
-	const toggleMerit = {
-		transform(text /* whole line */) {
-			const meritRegex = /^\(\+\)\s(.*)/;
-			return meritRegex.test(text)
-				? text.replace(meritRegex, "$1")
-				: `(+) ${text}`;
-		},
-		postTransformCursorPos: 4 /* "(+) " - 4 characters */,
-	};
+	// const toggleMerit = {
+	// 	transform(text /* whole line */) {
+	// 		const meritRegex = /^\(\+\)\s(.*)/;
+	// 		return meritRegex.test(text)
+	// 			? text.replace(meritRegex, "$1")
+	// 			: `(+) ${text}`;
+	// 	},
+	// 	postTransformCursorPos: 4 /* "(+) " - 4 characters */,
+	// };
 
 	const toggleheading = {
 		transform(text) {
@@ -279,12 +280,38 @@ hello world hii
 		onlyForward: true,
 	};
 
+	// const toggleDemerit = {
+	// 	transform(text) {
+	// 		const demeritRegex = /^\(-\)\s(.*)/;
+	// 		return demeritRegex.test(text)
+	// 			? text.replace(demeritRegex, "$1")
+	// 			: `(-) ${text}`;
+	// 	},
+	// 	postTransformCursorPos: 4,
+	// };
+
+	const toggleMerit = {
+		transform(text) {
+			const meritRegex = /^\((\+|-)\)(.*)/;
+			const match = meritRegex.exec(text);
+			return match
+				? match[1] === "+"
+					? text.replace(meritRegex, "$2")
+					: text.replace(meritRegex, "(+)$2")
+				: `(+)${text}`;
+		},
+		postTransformCursorPos: 4,
+	};
+
 	const toggleDemerit = {
 		transform(text) {
-			const demeritRegex = /^\(-\)\s(.*)/;
-			return demeritRegex.test(text)
-				? text.replace(demeritRegex, "$1")
-				: `(-) ${text}`;
+			const demeritRegex = /^\((\+|-)\)(.*)/;
+			const match = demeritRegex.exec(text);
+			return match
+				? match[1] === "-"
+					? text.replace(demeritRegex, "$2")
+					: text.replace(demeritRegex, "(-)$2")
+				: `(-)${text}`;
 		},
 		postTransformCursorPos: 4,
 	};
@@ -343,14 +370,14 @@ hello world hii
 						lineTransformer(toggleMerit);
 					}}
 				>
-					HEADING
+					MERIT
 				</button>
 				<button
 					onClick={() => {
 						lineTransformer(toggleDemerit);
 					}}
 				>
-					HEADING
+					DEMERIT
 				</button>
 			</div>
 		</div>
