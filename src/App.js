@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import "./App.scss";
 import Preview from "./Preview";
 
-import "./CodeMirror/MarkdownChitragupta";
+import "./MarkdownChitragupta";
 import "./CodeMirror/theme-dark.css";
 
 import CodeMirror from "./CodeMirror";
