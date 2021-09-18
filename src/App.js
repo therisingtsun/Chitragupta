@@ -209,17 +209,10 @@ hello world hii
 		lengthDifference,
 		positionOfCursor
 	) {
-		if (lengthDifference < 0) {
-			editor.setCursor(
-				positionOfCursor.line,
-				positionOfCursor.ch - lengthDifference
-			);
-		} else {
-			editor.setCursor(
-				positionOfCursor.line,
-				positionOfCursor.ch - lengthDifference
-			);
-		}
+		editor.setCursor(
+			positionOfCursor.line,
+			positionOfCursor.ch - lengthDifference
+		);
 	}
 
 	function setFocusOnEditor(editor) {
@@ -256,16 +249,6 @@ hello world hii
 		postTransformCursorPos: 2,
 	};
 
-	// const toggleMerit = {
-	// 	transform(text /* whole line */) {
-	// 		const meritRegex = /^\(\+\)\s(.*)/;
-	// 		return meritRegex.test(text)
-	// 			? text.replace(meritRegex, "$1")
-	// 			: `(+) ${text}`;
-	// 	},
-	// 	postTransformCursorPos: 4 /* "(+) " - 4 characters */,
-	// };
-
 	const toggleheading = {
 		transform(text) {
 			const noHeadingRegex = /^([^#]+)/;
@@ -274,21 +257,9 @@ hello world hii
 				? `# ${text}`
 				: headingRegex.test(text)
 				? text.replace(headingRegex, "$1# $2")
-				: text; /* do nothing if 6 #'s. H6 is last heading */
+				: text;
 		},
-		postTransformCursorPos: 2 /* "# " - 2 characters */,
-		onlyForward: true,
 	};
-
-	// const toggleDemerit = {
-	// 	transform(text) {
-	// 		const demeritRegex = /^\(-\)\s(.*)/;
-	// 		return demeritRegex.test(text)
-	// 			? text.replace(demeritRegex, "$1")
-	// 			: `(-) ${text}`;
-	// 	},
-	// 	postTransformCursorPos: 4,
-	// };
 
 	const toggleMerit = {
 		transform(text) {
@@ -300,7 +271,6 @@ hello world hii
 					: text.replace(meritRegex, "(+)$2")
 				: `(+)${text}`;
 		},
-		postTransformCursorPos: 4,
 	};
 
 	const toggleDemerit = {
@@ -313,7 +283,6 @@ hello world hii
 					: text.replace(demeritRegex, "(-)$2")
 				: `(-)${text}`;
 		},
-		postTransformCursorPos: 4,
 	};
 
 	return (
