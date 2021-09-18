@@ -37,16 +37,16 @@ import math
 print(math.floor(102.111))
 \`\`\`
 
+hello world hii
 `);
 	const data = useRef();
 	const changeHandler = (value) => {
 		setText(value);
 	};
 
-	function transformer(config) {
+	function wordTransformer(config) {
 		const editor = data.current.editor;
 		const cursorPosition = editor.listSelections();
-		console.log("cursor pos ", cursorPosition);
 
 		const nullCheck = checkEmptySpaceSelection(editor);
 
@@ -60,14 +60,55 @@ print(math.floor(102.111))
 			.map((text) => config.transform(text));
 		editor.replaceSelections(changedData);
 
-		let formatted = prevData[0].length < changedData[0].length;
-		modifyPostTransformCursorPos(config, formatted);
+		const isFormatted = checkIfFormatted(
+			prevData[0].length,
+			changedData[0].length
+		);
+		modifyPostTransformCursorPos(config, isFormatted);
 
-		cursorPlacement(editor, nullCheck, config, cursorPosition);
+		cursorPlacementForWordTransform(
+			editor,
+			nullCheck,
+			config,
+			cursorPosition
+		);
 
 		setFocusOnEditor(editor);
 	}
 
+	function lineTransformer(config) {
+		const editor = data.current.editor;
+		const positionOfCursor = editor.getCursor();
+		let contentOfLine = editor.getLine(positionOfCursor.line);
+
+		editor.setSelection(
+			{
+				line: positionOfCursor.line,
+				ch: 0,
+			},
+			{
+				line: positionOfCursor.line,
+				ch: contentOfLine.length,
+			}
+		);
+		const transformedLine = config.transform(contentOfLine);
+		editor.replaceSelection(transformedLine);
+		let updatedContentOfLine = editor.getLine(positionOfCursor.line);
+
+		const isFormatted = checkIfFormatted(
+			contentOfLine.length,
+			updatedContentOfLine.length
+		);
+
+		modifyPostTransformCursorPos(config, isFormatted);
+		cursorPlacementForLineTransform(
+			editor,
+			config,
+			isFormatted,
+			positionOfCursor
+		);
+		setFocusOnEditor(editor);
+	}
 	function checkEmptySpaceSelection(editor) {
 		const cursorPosition = editor.getCursor();
 		const check = editor.findWordAt(cursorPosition);
@@ -83,18 +124,33 @@ print(math.floor(102.111))
 
 	function selectEnclosingWords(editor) {
 		const listSelections = editor.listSelections();
-		console.log("list sel", listSelections);
 		let selections = [];
 		listSelections.forEach((element) => {
 			if (element.anchor.ch === element.head.ch) {
 				const pos = editor.findWordAt(element.anchor);
+				const getLineOfCursor = editor.getCursor();
+				const lineOfCursor = editor.getLine(getLineOfCursor.line);
+
+				let startIndex = pos.anchor.ch;
+				let endIndex = pos.head.ch;
+
+				while (startIndex > 0) {
+					if (/\s/.test(lineOfCursor[startIndex - 1])) break;
+					else startIndex--;
+				}
+
+				while (endIndex < lineOfCursor.length) {
+					if (/\s/.test(lineOfCursor[endIndex])) break;
+					else endIndex++;
+				}
+
 				selections.push({
 					anchor: {
-						ch: pos.anchor.ch,
+						ch: startIndex,
 						line: pos.anchor.line,
 					},
 					head: {
-						ch: pos.head.ch,
+						ch: endIndex,
 						line: pos.head.line,
 					},
 				});
@@ -104,13 +160,22 @@ print(math.floor(102.111))
 		return selections;
 	}
 
+	function checkIfFormatted(prevLen, postLen) {
+		return prevLen < postLen;
+	}
+
 	function modifyPostTransformCursorPos(config, formatted) {
 		config.postTransformCursorPos = formatted
 			? config.postTransformCursorPos
 			: -config.postTransformCursorPos;
 	}
 
-	function cursorPlacement(editor, nullCheck, config, cursorPosition) {
+	function cursorPlacementForWordTransform(
+		editor,
+		nullCheck,
+		config,
+		cursorPosition
+	) {
 		if (nullCheck) {
 			const currentPos = editor.getCursor();
 
@@ -137,6 +202,25 @@ print(math.floor(102.111))
 		}
 	}
 
+	function cursorPlacementForLineTransform(
+		editor,
+		config,
+		formatted,
+		positionOfCursor
+	) {
+		if (formatted || config.onlyForward) {
+			editor.setCursor(
+				positionOfCursor.line,
+				positionOfCursor.ch + config.postTransformCursorPos
+			);
+		} else {
+			editor.setCursor(
+				positionOfCursor.line,
+				positionOfCursor.ch - config.postTransformCursorPos
+			);
+		}
+	}
+
 	function setFocusOnEditor(editor) {
 		if (!editor.hasFocus()) editor.focus();
 	}
@@ -153,12 +237,56 @@ print(math.floor(102.111))
 
 	const toggleBold = {
 		transform(text) {
-			const boldRegex = /^__((?:.|\r?\n)*?)__$/;
+			const boldRegex = /^\*\*((?:.|\r?\n)*?)\*\*$/;
 			return boldRegex.test(text)
 				? text.replace(boldRegex, "$1")
-				: `__${text}__`;
+				: `\*\*${text}\*\*`;
 		},
 		postTransformCursorPos: 2,
+	};
+
+	const toggleStrikethrough = {
+		transform(text) {
+			const boldRegex = /^~~((?:.|\r?\n)*?)~~$/;
+			return boldRegex.test(text)
+				? text.replace(boldRegex, "$1")
+				: `~~${text}~~`;
+		},
+		postTransformCursorPos: 2,
+	};
+
+	const toggleMerit = {
+		transform(text /* whole line */) {
+			const meritRegex = /^\(\+\)\s(.*)/;
+			return meritRegex.test(text)
+				? text.replace(meritRegex, "$1")
+				: `(+) ${text}`;
+		},
+		postTransformCursorPos: 4 /* "(+) " - 4 characters */,
+	};
+
+	const toggleheading = {
+		transform(text) {
+			const noHeadingRegex = /^([^#]+)/;
+			const headingRegex = /^(#{1,5})\s(.*)/;
+			return noHeadingRegex.test(text)
+				? `# ${text}`
+				: headingRegex.test(text)
+				? text.replace(headingRegex, "$1# $2")
+				: text; /* do nothing if 6 #'s. H6 is last heading */
+		},
+		postTransformCursorPos: 2 /* "# " - 2 characters */,
+		onlyForward: true,
+	};
+
+	const toggleDemerit = {
+		transform(text) {
+			const demeritRegex = /^\(-\)\s(.*)/;
+			return demeritRegex.test(text)
+				? text.replace(demeritRegex, "$1")
+				: `(-) ${text}`;
+		},
+		postTransformCursorPos: 4,
 	};
 
 	return (
@@ -191,17 +319,38 @@ print(math.floor(102.111))
 				</button>
 				<button
 					onClick={() => {
-						transformer(toggleItalics);
+						wordTransformer(toggleItalics);
 					}}
 				>
 					ITALIC
 				</button>
 				<button
 					onClick={() => {
-						strikethroughText();
+						wordTransformer(toggleStrikethrough);
 					}}
 				>
 					STRIKETHROUGH
+				</button>
+				<button
+					onClick={() => {
+						lineTransformer(toggleheading);
+					}}
+				>
+					HEADING
+				</button>
+				<button
+					onClick={() => {
+						lineTransformer(toggleMerit);
+					}}
+				>
+					HEADING
+				</button>
+				<button
+					onClick={() => {
+						lineTransformer(toggleDemerit);
+					}}
+				>
+					HEADING
 				</button>
 			</div>
 		</div>
