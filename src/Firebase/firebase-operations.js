@@ -1,4 +1,4 @@
-import React, { createContext, useContext } from "react";
+import React, { createContext, useContext, useState } from "react";
 
 import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
@@ -117,9 +117,35 @@ async function deleteNote(user, noteID) {
 function CreateNote() {
 	const add = () => createNote(auth.currentUser, {});		
 	return (
-		<button onClick={add}>Create Note</button>
+		<button
+			className="create-note-button"
+			onClick={add}
+		>
+			Create Note
+		</button>
 	);
 }
+
+function Tag({ tag }) {
+	const [active, setActive] = useState(false);
+
+	const toggleActive = () => {
+		setActive(!active);
+	};
+
+	return (
+		<div
+			className={`
+				note-tag
+				${active ? "--active" : ""}
+			`}
+			onClick={toggleActive}
+		>
+			#{tag}
+		</div>
+	);
+}
+
 
 function NoteOps({ note }) {
 	const modify = () => {
@@ -138,7 +164,7 @@ function NoteOps({ note }) {
 		});
 	};
 	return (
-		<span>
+		<div className="note-operations">
 			<label>
 				<input
 					type="checkbox"
@@ -148,17 +174,31 @@ function NoteOps({ note }) {
 			</label>
 			{" "} <button onClick={modify}> Modify Note </button>
 			{" "} <button onClick={remove}> Remove Note </button>
-		</span>
+		</div>
 	);
 }
 
-function SignOut() {
-	return auth.currentUser && (
-		<button onClick={() => auth.signOut()}> Sign out </button>
+function Note({ note }) {
+	return (
+		<div
+			className={`
+				note-card
+				${note.publicAccess ? "--public" : "--private"}
+			`}
+		>
+			<div>{note.name}</div>
+			<div
+				className="note-tags-listing"
+			>
+				{note.tags.map((t, i) => <Tag key={i} tag={t} />)}
+			</div>
+			<NoteOps note={note} />
+		</div>
 	);
 }
 
-function Notes() {
+
+function NotesListing() {
 	if (auth.currentUser) {
 		const [notes, loading, error] = useCollectionData(
 			db.collection("notes")
@@ -177,14 +217,8 @@ function Notes() {
 					<CreateNote />
 				</p>
 				<div>
-					{notes && notes.map(f => (
-						<div key={f.id}>
-							<pre><code>
-								Note ID: {f.id} <br />
-								Note Name: {f.name} 
-							</code></pre>
-							<NoteOps note={f} />
-						</div>
+					{notes && notes.map(n => (
+						<Note key={n.id} note={n} />
 					))}
 					{loading && "Loading..."}
 					{error && `ERROR: ${JSON.stringify(error)}`}
@@ -204,7 +238,7 @@ function SignIn() {
 			userRef.set({
 				tier: "free"
 			});
-			createNote(auth.currentUser, {
+			createNote(user, {
 				name: "Getting started",
 				tags: ["tutorial", "guide", "this-is-a-long-tag-as-an-example"],
 			});
@@ -214,8 +248,24 @@ function SignIn() {
 	return (
 		<div>
 			<p> Welcome! </p>
-			<button onClick={signInWith}>Sign In</button>
+			<button
+				className="sign-in-button"
+				onClick={signInWith}
+			>
+				Sign In with Google
+			</button>
 		</div>
+	);
+}
+
+function SignOut() {
+	return auth.currentUser && (
+		<button
+			className="sign-out-button"
+			onClick={() => auth.signOut()}
+		>
+			Sign out
+		</button>
 	);
 }
 
@@ -223,7 +273,7 @@ export default function Fb() {
 	const [user] = useAuthState(auth);
 	return (
 		<div>
-			{user ? <Notes /> : <SignIn />}
+			{user ? <NotesListing /> : <SignIn />}
 		</div>
 	);
 }
