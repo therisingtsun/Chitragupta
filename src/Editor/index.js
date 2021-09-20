@@ -1,12 +1,12 @@
 import React from "react";
 
 import "./App.scss";
-import Preview from "./Preview";
+import Preview from "../Preview";
 
 import "codemirror/mode/markdown/markdown";
 import "./theme-dark.css";
 
-import CodeMirror from "./CodeMirror";
+import CodeMirror from "../CodeMirror";
 
 const sample = `
 # Henlo worldo!
@@ -37,7 +37,7 @@ print(math.floor(102.111))
 \`\`\`
 `;
 
-export default function App() {
+export default function Editor() {
 	return (
 		<div className="App">
 			<CodeMirror

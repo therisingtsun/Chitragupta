@@ -1,29 +1,38 @@
-import React, { createContext, useContext, useState } from "react";
-
 import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
 import "firebase/compat/firestore";
 import "firebase/compat/storage";
 
-import { useAuthState } from "react-firebase-hooks/auth";
-import { useCollectionData, useDocumentData } from "react-firebase-hooks/firestore";
-
 import firebaseConfig from "./firebase-config";
 
 const app = firebase.initializeApp(firebaseConfig);
 
-const auth = firebase.auth();
+export const auth = firebase.auth(app);
 auth.useEmulator("http://localhost:9099");
 
-const db = firebase.firestore();
+export const db = firebase.firestore(app);
 db.useEmulator("localhost", 8080);
 
-const storage = firebase.storage();
+export const storage = firebase.storage(app);
 storage.useEmulator("localhost", 9199);
 
+export async function signInWith() {
+	const provider = new firebase.auth.GoogleAuthProvider();
+	const { user } = await auth.signInWithPopup(provider);
+	const userRef = db.collection("users").doc(user.uid);
+	const root = await userRef.get();
+	if (!root.exists) {
+		userRef.set({
+			tier: "free"
+		});
+		createNote(user, {
+			name: "Getting started",
+			tags: ["tutorial", "guide", "this-is-a-long-tag-as-an-example"],
+		});
+	}
+}
 
-
-async function createNote(user, noteData, content = "") {
+export async function createNote(user, noteData, content = "") {
 	if (user) {
 		const data = Object.assign({
 			author: user.uid,
@@ -49,7 +58,7 @@ async function createNote(user, noteData, content = "") {
 	}
 }
 
-async function uploadNote(user, noteID, noteData, content) {
+export async function uploadNote(user, noteID, noteData, content) {
 	if (typeof content === "string") {
 		if (user) {
 			const metadata = {
@@ -65,7 +74,7 @@ async function uploadNote(user, noteID, noteData, content) {
 	} else return null;
 }
 
-async function modifyNoteContent(user, noteID, noteData, content) {
+export async function modifyNoteContent(user, noteID, noteData, content) {
 	if (typeof content === "string") {
 		if (user) {
 			const data = Object.assign({
@@ -87,7 +96,7 @@ async function modifyNoteContent(user, noteID, noteData, content) {
 	} else return null;
 }
 
-async function modifyNoteMetadata(user, noteID, noteData) {
+export async function modifyNoteMetadata(user, noteID, noteData) {
 	if (user) {
 		const data = Object.assign({}, noteData);
 
@@ -102,7 +111,7 @@ async function modifyNoteMetadata(user, noteID, noteData) {
 	}
 }
 
-async function deleteNote(user, noteID) {
+export async function deleteNote(user, noteID) {
 	if (user) {
 		return Promise.all([
 			db.collection("notes").doc(noteID).delete(),
@@ -111,169 +120,4 @@ async function deleteNote(user, noteID) {
 	} else {
 		// no account usage goes here
 	}
-}
-
-
-function CreateNote() {
-	const add = () => createNote(auth.currentUser, {});		
-	return (
-		<button
-			className="create-note-button"
-			onClick={add}
-		>
-			Create Note
-		</button>
-	);
-}
-
-function Tag({ tag }) {
-	const [active, setActive] = useState(false);
-
-	const toggleActive = () => {
-		setActive(!active);
-	};
-
-	return (
-		<div
-			className={`
-				note-tag
-				${active ? "--active" : ""}
-			`}
-			onClick={toggleActive}
-		>
-			#{tag}
-		</div>
-	);
-}
-
-
-function NoteOps({ note }) {
-	const modify = () => {
-		modifyNoteContent(
-			auth.currentUser, note.id, note,
-			Math.random().toString(16) /* new data */
-		);
-	};
-	const remove = () => {
-		deleteNote(auth.currentUser, note.id);
-	};
-	const visibility = () => {
-		const publicAccess = !note.publicAccess;
-		modifyNoteMetadata(auth.currentUser.uid, note.id, {
-			publicAccess
-		});
-	};
-	return (
-		<div className="note-operations">
-			<label>
-				<input
-					type="checkbox"
-					defaultChecked={note.publicAccess}
-					onChange={visibility}
-				/> Public?
-			</label>
-			{" "} <button onClick={modify}> Modify Note </button>
-			{" "} <button onClick={remove}> Remove Note </button>
-		</div>
-	);
-}
-
-function Note({ note }) {
-	return (
-		<div
-			className={`
-				note-card
-				${note.publicAccess ? "--public" : "--private"}
-			`}
-		>
-			<div>{note.name}</div>
-			<div
-				className="note-tags-listing"
-			>
-				{note.tags.map((t, i) => <Tag key={i} tag={t} />)}
-			</div>
-			<NoteOps note={note} />
-		</div>
-	);
-}
-
-
-function NotesListing() {
-	if (auth.currentUser) {
-		const [notes, loading, error] = useCollectionData(
-			db.collection("notes")
-				.where("author", "==", auth.currentUser.uid)
-				.orderBy("modified", "desc")
-			, {
-				idField: "id"
-			}
-		);
-	
-		return (
-			<div>
-				<SignOut />
-				<p> {auth.currentUser.displayName}'s Notes: </p>
-				<p>
-					<CreateNote />
-				</p>
-				<div>
-					{notes && notes.map(n => (
-						<Note key={n.id} note={n} />
-					))}
-					{loading && "Loading..."}
-					{error && `ERROR: ${JSON.stringify(error)}`}
-				</div>
-			</div>
-		);
-	} else return (null);
-}
-
-function SignIn() {
-	const signInWith = async () => {
-		const provider = new firebase.auth.GoogleAuthProvider();
-		const { user } = await auth.signInWithPopup(provider);
-		const userRef = db.collection("users").doc(user.uid);
-		const root = await userRef.get();
-		if (!root.exists) {
-			userRef.set({
-				tier: "free"
-			});
-			createNote(user, {
-				name: "Getting started",
-				tags: ["tutorial", "guide", "this-is-a-long-tag-as-an-example"],
-			});
-		}
-	};
-	
-	return (
-		<div>
-			<p> Welcome! </p>
-			<button
-				className="sign-in-button"
-				onClick={signInWith}
-			>
-				Sign In with Google
-			</button>
-		</div>
-	);
-}
-
-function SignOut() {
-	return auth.currentUser && (
-		<button
-			className="sign-out-button"
-			onClick={() => auth.signOut()}
-		>
-			Sign out
-		</button>
-	);
-}
-
-export default function Fb() {
-	const [user] = useAuthState(auth);
-	return (
-		<div>
-			{user ? <NotesListing /> : <SignIn />}
-		</div>
-	);
 }

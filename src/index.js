@@ -3,15 +3,15 @@ import "regenerator-runtime/runtime";
 
 import React from "react";
 import ReactDOM from "react-dom";
-import App from "./App.js";
 import { BrowserRouter as Router } from "react-router-dom";
 
-import Fb from "./Firebase/firebase-operations";
+import App from "./App";
+
+import "./index.scss";
 
 ReactDOM.render(
-	// <Router>
-	// 	<App />
-	// </Router>,
-	<Fb />,
+	<Router>
+		<App />
+	</Router>,
 	document.getElementById("root")
 );
