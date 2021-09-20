@@ -1,0 +1,42 @@
+$black: #141414;
+$blue: #4444ff;
+
+.markdown-preview {
+	box-sizing: border-box;
+	padding: 1em 2em;
+
+	background-color: $black;
+	color: #adbac7;
+
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial,
+		sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+
+	overflow: auto;
+
+	.hljs {
+		border: 2px solid #3f454a;
+	}
+
+	blockquote {
+		margin: 1rem 2em;
+	}
+
+	.merit-block {
+		margin: 1em -2em;
+		padding: 1em 4em;
+
+		&.merit {
+			color: #90b0a6;
+			background-color: #0e3529;
+		}
+
+		&.demerit {
+			color: #bca4ad;
+			background-color: #3b1422;
+		}
+
+		> p {
+			margin: 0;
+		}
+	}
+}
