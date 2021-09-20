@@ -1,16 +1,17 @@
+import "core-js/stable";
+import "regenerator-runtime/runtime";
+
 import React from "react";
 import ReactDOM from "react-dom";
-import App from "./App.js";
 import { BrowserRouter as Router } from "react-router-dom";
 
-import "./index.scss";
+import App from "./App";
 
-// import Fb from "./firebase-test";
+import "./index.scss";
 
 ReactDOM.render(
 	<Router>
 		<App />
 	</Router>,
-	// <Fb />,
 	document.getElementById("root")
 );

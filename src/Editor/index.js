@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 
 import "./App.scss";
-import Preview from "./Preview";
+import Preview from "../Preview";
 
 import "./MarkdownChitragupta";
 import "./CodeMirror/theme-dark.css";
 
-import CodeMirror from "./CodeMirror";
+import CodeMirror from "../CodeMirror";
 
 const sample = `
 # Henlo worldo!

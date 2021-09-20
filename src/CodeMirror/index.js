@@ -1,3 +1,5 @@
+// Adapted from https://github.com/uiwjs/react-codemirror which is licensed under the MIT license.
+
 import React, { useRef, useEffect, useImperativeHandle, useState, useMemo } from "react";
 import CodeMirror from "codemirror";
 import "codemirror/mode/meta";
