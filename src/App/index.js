@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Switch, Link, Route } from "react-router-dom";
 
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -11,7 +11,6 @@ import {
 	signInWith,
 
 	createNote,
-	modifyNote,
 	deleteNote,
 	modifyNoteContent,
 	uploadNote,
@@ -26,7 +25,10 @@ import {
 	faPen,
 } from '@fortawesome/free-solid-svg-icons'
 
+import Popup from 'reactjs-popup';
+
 import "./index.scss";
+import LoadingMessage from "./loading-messages";
 
 function CreateNote() {
 	const add = () => createNote(auth.currentUser, {});		
@@ -88,15 +90,52 @@ function NoteOps({ note }) {
 	);
 }
 
-function Note({ note }) {
+function DeleteNotePopup({ note }) {
 	const remove = () => {
 		deleteNote(auth.currentUser, note.id);
 	};
 
 	return (
+		<Popup trigger={
+			<Link to="/" className="delete-link">
+				Delete <FontAwesomeIcon icon={faTrash} />
+			</Link>
+		} modal>
+			{ close => (
+				<div className="popup-modal">
+					<p>
+						This will permanently delete the note. Proceed?
+					</p>
+					<p className="delete-confirm-para">
+						<Link to="/" onClick={remove} className="delete-confirm-link">
+							Delete
+						</Link>
+						<Link to="/" onClick={close}>
+							Cancel
+						</Link>
+					</p>
+				</div>
+			)}
+		</Popup>
+	);
+}
+
+function Note({ note, status }) {
+	const [noteName, setNoteName] = useState(note.name);
+	const blurEvent = async e => {
+		const name = e.target.value.trim();
+		if (name && name !== note.name) {
+			status.current.innerHTML = "Syncing…"
+			await modifyNoteMetadata(auth.currentUser, note.id, { name });
+			status.current.innerHTML = "All changes saved";
+		}
+	}
+	return (
 		<div className="note-card">
 			<div className="note-info">
-				<div className="note-name">{note.name}</div>	
+				<input type="text" className="note-name" 
+				onChange={(e) => setNoteName(e.target.value)}
+				onBlur={blurEvent} value={noteName}/>
 				<div className="visibility-icon">
 					{note.publicAccess ? "Public" : "Private"}{" "}
 					<FontAwesomeIcon icon={note.publicAccess ? faUnlockAlt : faLock} />
@@ -106,15 +145,14 @@ function Note({ note }) {
 				<Link to={`/note/${note.id}`} className="edit-link">
 					<FontAwesomeIcon icon={faPen} /> Edit
 				</Link>
-				<Link to="/" onClick={remove} className="delete-link">
-					Delete <FontAwesomeIcon icon={faTrash} />
-				</Link>
+				<DeleteNotePopup note={note}/>
 			</div>
 		</div>
 	);
 }
 
 function NotesListing() {
+	const statusRef = useRef(null);
 	if (auth.currentUser) {
 		const [notes, loading, error] = useCollectionData(
 			db.collection("notes")
@@ -128,17 +166,20 @@ function NotesListing() {
 		return (
 			<div>
 				<SignOut />
-				<p> {auth.currentUser.displayName}'s Notes: </p>
+				<div className="user-notes-title">
+					{auth.currentUser.displayName}'s Notes:
+				</div>
+				<div className="status-indicator" ref={statusRef}></div>
 				<p>
 					<CreateNote />
 				</p>
 				<div className="notes-listing">
 					{notes && notes.map(n => (
-						<Note key={n.id} note={n} />
+						<Note key={n.id} note={n} status={statusRef}/>
 					))}
-					{loading && "Loading..."}
-					{error && `ERROR: ${JSON.stringify(error)}`}
 				</div>
+				{loading && <div className="notes-loader">{LoadingMessage()}</div>}
+				{error && `ERROR: ${JSON.stringify(error)}`}
 			</div>
 		);
 	} else return (null);
