@@ -30,7 +30,11 @@ import {
 } from "./toolbarVariables";
 
 const Toolbar = (props) => {
-	const { wordTransformer, lineTransformer } = props;
+	const { wordTransformer, lineTransformer, preview, editor } = props;
+
+	const togglePreview = () => {
+		preview.current.classList.toggle("--hidden");
+	};
 	return (
 		<div className="toolbar-box">
 			<button
@@ -40,8 +44,6 @@ const Toolbar = (props) => {
 				}}
 			>
 				<FontAwesomeIcon icon={faBold} className={"toolbar-icon"} />
-
-				{/* <i class="fas fa-bold"></i> */}
 			</button>
 
 			<button
@@ -51,8 +53,6 @@ const Toolbar = (props) => {
 				}}
 			>
 				<FontAwesomeIcon icon={faItalic} className={"toolbar-icon"} />
-
-				{/* <i class="fas fa-italic"></i> */}
 			</button>
 
 			<button
@@ -65,8 +65,6 @@ const Toolbar = (props) => {
 					icon={faStrikethrough}
 					className={"toolbar-icon"}
 				/>
-
-				{/* <i class="fas fa-strikethrough"></i> */}
 			</button>
 
 			<button
@@ -76,8 +74,6 @@ const Toolbar = (props) => {
 				}}
 			>
 				<FontAwesomeIcon icon={faHeading} className={"toolbar-icon"} />
-
-				{/* <i class="fas fa-heading"></i> */}
 			</button>
 
 			<button
@@ -87,8 +83,6 @@ const Toolbar = (props) => {
 				}}
 			>
 				<FontAwesomeIcon icon={faListUl} className={"toolbar-icon"} />
-
-				{/* <i class="fas fa-list-ul"></i> */}
 			</button>
 
 			<button
@@ -98,8 +92,6 @@ const Toolbar = (props) => {
 				}}
 			>
 				<FontAwesomeIcon icon={faImage} className={"toolbar-icon"} />
-
-				{/* <i class="fas fa-image"></i> */}
 			</button>
 
 			<button
@@ -112,8 +104,6 @@ const Toolbar = (props) => {
 					icon={faQuoteLeft}
 					className={"toolbar-icon"}
 				/>
-
-				{/* <i class="fas fa-quote-left"></i> */}
 			</button>
 
 			<button
@@ -126,8 +116,6 @@ const Toolbar = (props) => {
 					icon={faPlusCircle}
 					className={"toolbar-icon"}
 				/>
-
-				{/* <i class="fas fa-plus-circle"></i> */}
 			</button>
 
 			<button
@@ -140,8 +128,6 @@ const Toolbar = (props) => {
 					icon={faMinusCircle}
 					className={"toolbar-icon"}
 				/>
-
-				{/* <i class="fas fa-minus-circle"></i> */}
 			</button>
 
 			<button
@@ -151,8 +137,6 @@ const Toolbar = (props) => {
 				}}
 			>
 				<FontAwesomeIcon icon={faCode} className={"toolbar-icon"} />
-
-				{/* <i class="fas fa-code"></i> */}
 			</button>
 			<button
 				className={"undo"}
@@ -161,8 +145,6 @@ const Toolbar = (props) => {
 				}}
 			>
 				<FontAwesomeIcon icon={faUndo} className={"toolbar-icon"} />
-
-				{/* <i class="fas fa-undo"></i> */}
 			</button>
 			<button
 				className={"redo"}
@@ -171,8 +153,6 @@ const Toolbar = (props) => {
 				}}
 			>
 				<FontAwesomeIcon icon={faRedo} className={"toolbar-icon"} />
-
-				{/* <i class="fas fa-redo"></i> */}
 			</button>
 			<button
 				className={"print"}
@@ -181,8 +161,6 @@ const Toolbar = (props) => {
 				}}
 			>
 				<FontAwesomeIcon icon={faPrint} className={"toolbar-icon"} />
-
-				{/* <i class="fas fa-print"></i> */}
 			</button>
 			<button
 				className={"share"}
@@ -191,8 +169,6 @@ const Toolbar = (props) => {
 				}}
 			>
 				<FontAwesomeIcon icon={faShareAlt} className={"toolbar-icon"} />
-
-				{/* <i class="fas fa-share-alt"></i> */}
 			</button>
 			<button
 				className={"chooseaccess"}
@@ -204,18 +180,14 @@ const Toolbar = (props) => {
 					icon={faUnlockAlt}
 					className={"toolbar-icon"}
 				/>
-
-				{/* <i class="fas fa-unlock-alt"></i> */}
 			</button>
 			<button
 				className={"preview"}
 				onClick={() => {
-					actionHandler(togglePreview);
+					togglePreview();
 				}}
 			>
 				<FontAwesomeIcon icon={faEye} className={"toolbar-icon"} />
-
-				{/* <i class="fas fa-eye"></i> */}
 			</button>
 		</div>
 	);

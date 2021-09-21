@@ -50,9 +50,23 @@ import math
 print(math.floor(102.111))
 \`\`\`
 `);
+	const [customTags, setCustomTags] = useState([]);
 	const data = useRef();
+	const preview = useRef();
+	const editorBox = useRef();
+	const tag = useRef();
+
 	const changeHandler = (value) => {
 		setText(value);
+	};
+
+	const tagsChangeHandler = () => {
+		let inputTags = tag.current.value;
+		let customTagsArray = inputTags
+			.trim()
+			.split(/\s+/)
+			.filter((s) => s.length);
+		setCustomTags(customTagsArray);
 	};
 
 	function wordTransformer(config) {
@@ -121,30 +135,66 @@ print(math.floor(102.111))
 		setFocusOnEditor(editor);
 	}
 
+	function renderTags() {
+		const tagsJSX = customTags.map((element) => {
+			return (
+				<>
+					<div>{"#" + element}</div>
+				</>
+			);
+		});
+		return <div className="tagsdisplay-box">{tagsJSX}</div>;
+	}
+
 	return (
 		<div className="App">
-			<Toolbar
-				wordTransformer={wordTransformer}
-				lineTransformer={lineTransformer}
-			/>
-			<div className="editor">
-				<CodeMirror
-					value={text}
-					options={{
-						mode: "markdown",
-						theme: "theme-dark",
-						indentUnit: 4,
-						indentWithTabs: true,
-						tabSize: 4,
-						lineWrapping: true,
-					}}
-					onChange={(value, viewUpdate) => {
-						let str = value.getValue();
-						changeHandler(str);
-					}}
-					ref={data}
+			<div className="note-header">
+				<div className="title">Getting Started</div>
+				<div className="custom-tags">
+					<textarea
+						className="tags"
+						ref={tag}
+						value={customTags.forEach((element) => {
+							return element;
+						})}
+						onChange={() => {
+							tagsChangeHandler();
+						}}
+						placeholder="Enter your tags!"
+					/>
+				</div>
+			</div>
+			{renderTags()}
+			<div className="toolbar">
+				<Toolbar
+					wordTransformer={wordTransformer}
+					lineTransformer={lineTransformer}
+					preview={preview}
+					editor={editorBox}
 				/>
-				<Preview value={text} />
+			</div>
+			<div className="note-panel">
+				<div className="editor" ref={editorBox}>
+					<CodeMirror
+						value={text}
+						options={{
+							mode: "markdown",
+							theme: "theme-dark",
+							indentUnit: 4,
+							indentWithTabs: true,
+							tabSize: 4,
+							lineWrapping: true,
+						}}
+						onChange={(value, viewUpdate) => {
+							let str = value.getValue();
+							changeHandler(str);
+						}}
+						ref={data}
+					/>
+				</div>
+				<div className="preview" ref={preview}>
+					<Preview value={text} />
+				</div>
 			</div>
 		</div>
 	);

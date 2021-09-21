@@ -11,6 +11,7 @@
 	line-height: 2;
 	font-family: Consolas, "Lucida Console", Monaco, monospace;
 	border-radius: 0;
+	height: 70vh;
 }
 /* .cm-s-theme-dark.CodeMirror-focused {
 } */
