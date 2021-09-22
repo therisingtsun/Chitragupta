@@ -3,13 +3,18 @@
 	flex-flow: row wrap;
 	align-items: center;
 	justify-content: space-evenly;
+	user-select: none;
+
+	.read-only {
+		color: var(--f);
+		opacity: 0.5;
+		padding: 0 1rem;
+	}
 	
 	button {
-		color: #acb0b899;
+		color: var(--f);
+		opacity: 0.5;
 		background: transparent;
-		box-shadow: 0px 0px 0px transparent;
-		border: 0px solid transparent;
-		text-shadow: 0px 0px 0px transparent;
 		padding: 1rem;	
 		outline: none;
 		border: none;
@@ -17,10 +22,7 @@
 		
 		&:hover {
 			color: white;
-			background: transparent;
-			box-shadow: 0px 0px 0px transparent;
-			border: 0px solid transparent;
-			text-shadow: 0px 0px 0px transparent;
+			opacity: 1;
 		}
 
 		&:last-of-type {

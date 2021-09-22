@@ -4,6 +4,7 @@ import "firebase/compat/firestore";
 import "firebase/compat/storage";
 
 import firebaseConfig from "./firebase-config";
+import GettingStarted from "./getting-started";
 
 const app = firebase.initializeApp(firebaseConfig);
 
@@ -28,7 +29,7 @@ export async function signInWith() {
 		createNote(user, {
 			name: "Getting started",
 			tags: ["tutorial", "guide", "this-is-a-long-tag-as-an-example"],
-		});
+		}, GettingStarted(user.displayName));
 	}
 }
 

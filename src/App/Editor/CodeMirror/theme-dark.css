@@ -2,8 +2,9 @@
 	background-color: var(--dark);
 	color: var(--f);
 	line-height: 2;
-	font-family: Consolas, "Lucida Console", Monaco, monospace;
-	border: 2px solid transparent;
+	font-family: var(--f-mono);
+	border-left: 2px solid transparent;
+	border-radius: 0;
 }
 
 .cm-s-theme-dark.CodeMirror-focused {
@@ -20,7 +21,17 @@
 .cm-s-theme-dark .CodeMirror-guttermarker-subtle,
 .cm-s-theme-dark .CodeMirror-linenumber {
 	color: var(--primary-light);
-	opacity: 0.5;
+	opacity: 0.25;
+}
+
+.cm-s-theme-dark .CodeMirror-activeline-background {
+	background: var(--f);
+	opacity: 0.1;
+}
+
+.cm-s-theme-dark .CodeMirror-activeline-gutter .CodeMirror-linenumber {
+	color: var(--f);
+	opacity: 1;
 }
 
 .cm-s-theme-dark.CodeMirror pre.CodeMirror-line {
@@ -64,11 +75,6 @@
 .cm-s-theme-dark .CodeMirror-line > span::selection,
 .cm-s-theme-dark .CodeMirror-line > span > span::selection {
 	background: rgba(128, 203, 196, 0.2);
-}
-
-.cm-s-theme-dark .CodeMirror-activeline-background {
-	background: var(--f);
-	opacity: 0.1;
 }
 
 .cm-s-theme-dark .cm-keyword {

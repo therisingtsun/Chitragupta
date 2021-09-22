@@ -12,7 +12,7 @@ import { modifyNoteMetadata } from "../../Firebase/firebase-operations";
 
 import "./index.scss";
 
-const Toolbar = ({ user, noteID, note, previewReference: [pVisible, setPVisible], editorReference }) => {
+const Toolbar = ({ user, noteID, note, previewVisibility: [pVisible, setPVisible], editorReference, editAccess }) => {
 	const [publicAccess, setPublicAccess] = useState(note.publicAccess);
 
 	const togglePublic = () => {
@@ -25,22 +25,27 @@ const Toolbar = ({ user, noteID, note, previewReference: [pVisible, setPVisible]
 	};
 	return (
 		<div className="toolbar-box">
-			{ToolbarItems.map((item, i) => {
-				const icon = item.icon;
-
-				const clickHandler = () => {
-					item.runner(editorReference.current.editor, item.action);
-				};
-			
-				return (
-					<button key={i} onClick={clickHandler} title={item.title}>
-						<FontAwesomeIcon icon={icon} />
+			{editAccess
+				? <>
+					{ToolbarItems.map((item, i) => {
+						const clickHandler = () => {
+							item.runner(editorReference.current.editor, item.action);
+						};
+					
+						return (
+							<button key={i} onClick={clickHandler} title={item.title}>
+								<FontAwesomeIcon icon={item.icon} />
+							</button>
+						)
+					})}
+					<button title="Toggle Public Access" onClick={togglePublic}>
+						<FontAwesomeIcon icon={publicAccess ? faUnlockAlt : faLock} />
 					</button>
-				)
-			})}
-			<button title="Toggle Public Access" onClick={togglePublic}>
-				<FontAwesomeIcon icon={publicAccess ? faUnlockAlt : faLock} />
-			</button>
+				</>
+				: <div className="read-only">
+					<FontAwesomeIcon icon={faLock} /> READ ONLY
+				</div>
+			}
 			<button title="Toggle Preview" onClick={togglePreview}>
 				<FontAwesomeIcon icon={faEye} />
 			</button>

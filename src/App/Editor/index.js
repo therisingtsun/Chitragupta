@@ -12,83 +12,44 @@ import "codemirror/keymap/sublime";
 
 import Toolbar from "./Toolbar";
 import { useDocumentData } from "react-firebase-hooks/firestore";
-import { db } from "../Firebase/firebase-operations";
+import { useDownloadURL } from "react-firebase-hooks/storage";
+import { db, storage } from "../Firebase/firebase-operations";
 
-const sample = `
-# Henlo worldo!
+const loadingString = "Loading…";
 
-**bold**
-_italics_
-~~strike~~
-<div id="idName">;-;</div>
-
-> Quote
-
-(+) Pro  
-(+) Piro
-
-(-) Con
-
-(+) Pro
-
-Normal
-
-(-) Con	
-
-Normal
-
-(+) Multiline
-Pro
-
-(-) Multiline
-(-) Con
-
-\`\`\`ts
-const x = 'lul';
-function (mlep: string) {
-	return "fook" + mlep;
-}
-\`\`\`
-\`\`\`cpp
-#include <iostream>
-
-int main() {
-	cout << "Henlo World!";
-	return 0;
-}
-\`\`\`
-\`\`\`py
-import math
-
-print(math.floor(102.111))
-\`\`\`
-`;
-
-export default function Editor({ user, noteID }) {
-	const noteRef = db.collection("notes").doc(noteID);
-	const [note, loading, error] = useDocumentData(noteRef);
-
-	const [noteName, setNoteName] = useState(null);
-	const [editorText, setEditorText] = useState(sample);
-	const [tagString, setTagString] = useState(null);
-	const [tags, setTags] = useState([]);
-
-	if (note) {
-		if (!noteName) setNoteName(note.name);
-		if (!tags.length) setTags(note.tags);
-		if (!tagString) setTagString(note.tags.join(" "));
+function Editor({ user, note, noteID }) {
+	const [noteName, setNoteName] = useState(note.name);
+	const [tags, setTags] = useState(note.tags);
+	const [tagString, setTagString] = useState(note.tags.join(" "));
+	const [editorText, setEditorText] = useState(loadingString);
+	
+	const editAccess = user.uid === note.author;
+	
+	const urlRef = storage.ref(`${note.author}/${noteID}.md`);
+	const [url, urlLoading, urlError] = useDownloadURL(urlRef);
+	const [contentLoaded, setContentLoaded] = useState(false);
+	
+	if (url && !contentLoaded) {
+		const xhr = new XMLHttpRequest();
+		xhr.responseType = "text";
+		xhr.onload = (event) => {
+			CMEditor?.current?.editor.setValue(xhr.response);
+			setContentLoaded(true);
+		};
+		xhr.open("GET", url);
+		xhr.send();
 	}
-
-	console.log(note);
 
 	const [previewVisible, setPreviewVisible] = useState(true);
 
 	const CMEditor = useRef(null);
 
 	function onNoteNameChange(e) {
-		const n = e.target.value;
-		if (n.length <= 256) {
-			setNoteName(n);
+		if (editAccess) {
+			const n = e.target.value;
+			if (n.length <= 256) {
+				setNoteName(n);
+			}
 		}
 	};
 	function onTagstringChange(e) {
@@ -100,7 +61,9 @@ export default function Editor({ user, noteID }) {
 		setEditorText(editor.getValue());
 	};
 
-	const UI = () => (
+	if (!editAccess && !note.publicAccess) {
+		return "No permissun, sowwies…";
+	} else return (
 		<div className="note-view">
 			<div className="note-header">
 				<input
@@ -109,26 +72,27 @@ export default function Editor({ user, noteID }) {
 					onChange={onNoteNameChange}
 				/>
 				<div className="note-tags">
-					<input
+					{editAccess && <input
 						className="tags-input"
 						value={tagString}
 						onChange={onTagstringChange}
-					/>
+					/>}
 					<div className="tags-list">
-						{tags.map((tag, i) => (<div key={i}>#{tag}</div>))}
+						{tags?.map((tag, i) => (<div key={i}>#{tag}</div>))}
 					</div>
 				</div>
 			</div>
 			<div className="toolbar">
 				<Toolbar
-					previewReference={[previewVisible, setPreviewVisible]}
+					previewVisibility={[previewVisible, setPreviewVisible]}
 					editorReference={CMEditor}
 					user={user}
 					note={note}
 					noteID={noteID}
+					editAccess={editAccess}
 				/>
 			</div>
-			<div className="note-panel">
+			<div className={`note-panel ${previewVisible ? "" : "--preview-hidden"}`}>
 				<div className="note-editor">
 					<CodeMirror
 						value={editorText}
@@ -141,22 +105,28 @@ export default function Editor({ user, noteID }) {
 							tabSize: 4,
 							lineWrapping: true,
 							cursorBlinkRate: 0,
-							keyMap: "sublime"
+							keyMap: "sublime",
+							readOnly: !editAccess
 						}}
 						onChange={onEditorChange}
 						ref={CMEditor}
 					/>
 				</div>
-				<div className={`note-preview ${previewVisible ? "" : "--hidden"}`}>
+				<div className="note-preview">
 					<Preview value={editorText} />
 				</div>
 			</div>
 		</div>
 	);
+}
+
+export default function NoteLoader({ user, noteID }) {	
+	const noteRef = db.collection("notes").doc(noteID);
+	const [note, loading, error] = useDocumentData(noteRef);
 
 	return (
 		<>
-			{note && UI()}
+			{note && (note.publicAccess || user.uid === note.author) && <Editor user={user} note={note} noteID={noteID} />}
 			{loading && "Loading…"}
 			{error && "Error"}
 		</>

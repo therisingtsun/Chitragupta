@@ -1,21 +1,18 @@
 import React, { useRef, useState } from "react";
-import { Switch, Link, Route, useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 import { useAuthState } from "react-firebase-hooks/auth";
-import { useCollectionData, useDocumentData } from "react-firebase-hooks/firestore";
+import { useCollectionData } from "react-firebase-hooks/firestore";
 
 import {
 	auth,
 	db,
-	storage,
 	signInWith,
 
 	createNote,
 	deleteNote,
-	modifyNoteContent,
-	uploadNote,
 	modifyNoteMetadata
-} from "../Firebase/firebase-operations";
+} from "./Firebase/firebase-operations";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -29,7 +26,7 @@ import Popup from 'reactjs-popup';
 
 import "./index.scss";
 import LoadingMessage from "./loading-messages";
-import Editor from "../Editor";
+import Editor from "./Editor";
 
 function CreateNote() {
 	const add = () => createNote(auth.currentUser, {});		
@@ -40,34 +37,6 @@ function CreateNote() {
 		>
 			Create Note
 		</button>
-	);
-}
-
-function NoteOps({ note }) {
-	const modify = () => {
-		modifyNoteContent(
-			auth.currentUser, note.id, note,
-			Math.random().toString(16) /* new data */
-		);
-	};
-	const remove = () => {
-		deleteNote(auth.currentUser, note.id);
-	};
-	const visibility = () => {
-		const publicAccess = !note.publicAccess;
-		modifyNoteMetadata(auth.currentUser, note.id, {
-			publicAccess
-		});
-	};
-	return (
-		<div className="note-operations">
-			<Link to={`/note/${note.id}`}>
-				<FontAwesomeIcon icon={faPenSquare} />
-			</Link>
-			<a onClick={remove}>
-				<FontAwesomeIcon icon={faTrash} />
-			</a>
-		</div>
 	);
 }
 

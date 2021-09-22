@@ -1,0 +1,111 @@
+.markdown-preview {
+	padding: 1rem 2rem;
+
+	border-left: 2px solid var(--bg);
+	
+	background-color: var(--bg-d);
+	color: var(--f);
+
+	line-height: 1.75;
+
+	overflow: auto;
+
+	blockquote {
+		margin: 1rem;
+		padding-left: 1rem;
+		border-left: 0.25rem solid var(--bg-l);
+	}
+
+	p {
+		img {
+			width: 100%;
+		}
+
+		code {
+			background-color: var(--bg-l);
+			padding: 0.1rem 0.25rem;
+			border: 1px solid var(--f);
+			border-radius: var( --base-border-radius);
+		}
+	}
+
+	table {
+		border: 2px solid var(--bg-l);
+		border-collapse: collapse;
+		border-radius: var( --base-border-radius);
+
+		tr {
+			th {
+				border-right: 1px solid var(--bg-l);
+				border-bottom: 2px solid var(--bg-l);
+				padding: 0.25rem 1rem;
+	
+				&:last-of-type {
+					border-right: none;
+				}
+			}
+			
+			td {
+				border-right: 1px solid var(--bg-l);
+				border-bottom: 1px solid var(--bg-l);
+				padding: 0.25rem 1rem;
+	
+	
+				&:last-of-type {
+					border-right: none;
+				}
+			}
+
+			&:last-of-type {
+				td {
+					border-bottom: none;
+				}
+			}
+		}
+
+	}
+	
+	a {
+		background-color: transparent;
+		color: var(--f-l);
+		text-decoration: underline;
+		padding: 0;
+		border-radius: 0;
+		user-select: text;
+
+		&:hover {
+			color: var(--primary-light);
+		}
+	}
+
+	.merit-block {
+		margin: 1rem -2rem;
+		padding: 1rem 4rem;
+
+		border: none;
+
+		&.merit {
+			color: #90b0a6;
+			background-color: #0e3529;
+		}
+	
+		&.demerit {
+			color: #bca4ad;
+			background-color: #3b1422;
+		}
+
+		> p {
+			margin: 0;
+		}
+	}
+
+	.hljs {
+		border-radius: 5px;
+		border: 2px solid var(--bg-l);
+		font-family: var(--f-mono);
+		font-size: 0.85rem;
+		background: var(--bg);
+		color: var(--f);
+	}
+
+}

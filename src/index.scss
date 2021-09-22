@@ -1,6 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato&display=swap');
+
 :root {
-	--primary: #4444FF;
-	--primary-light: #849FFF;
+	--primary: #0099ff;
+	--primary-light: #97d5ff;
+	--primary-dark: #003355;
 	
 	--bg: #262829;
 	--bg-l: #36383b;
@@ -13,6 +16,9 @@
 	--f-dark: #1b1c20;
 	
 	--base-border-radius: 6px;
+
+	--f-content: "Lato", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+	--f-mono: Consolas, "Lucida Console", Monaco, monospace;
 }
 
 .firebase-emulator-warning {
@@ -23,13 +29,17 @@ body {
 	background-color: var(--bg-d);
 	color: var(--f);
 
-	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+	font-family: var(--f-content);
 
 	margin: 0;
 }
 
 *, *::before, *::after {
 	box-sizing: border-box;
+}
+
+*::selection {
+	background-color: var(--primary-dark);
 }
 
 /* Webkit */
