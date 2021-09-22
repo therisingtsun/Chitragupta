@@ -5,13 +5,18 @@
 	--bg: #262829;
 	--bg-l: #36383b;
 	--bg-d: #1d1f20;
+
+	--dark: #121212;
 	
-	
-	--f: #a9adb6;
+	--f: #adbac7;
 	--f-l: #e6edf7;
 	--f-dark: #1b1c20;
 	
 	--base-border-radius: 6px;
+}
+
+.firebase-emulator-warning {
+	display: none;
 }
 
 body {

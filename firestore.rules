@@ -5,26 +5,21 @@ service cloud.firestore {
 		function isAuthorOf(res) {
 			return request.auth != null && request.auth.uid == res.data.author;
 		}
+		match /notes/{note} {
+			allow read;
+
+			allow create: if isAuthorOf(request.resource);
+			allow update, delete: if isAuthorOf(resource);
+		}
 
 		function isOwnerOf(res) {
 			return request.auth != null && request.auth.uid == res.id;
 		}
-
-		match /notes/{note} {
-			allow get: if resource.data.publicAccess || isAuthorOf(resource);
-			allow list: if isAuthorOf(resource);
-
-			allow create: if isAuthorOf(request.resource);
-			allow update: if isAuthorOf(resource) && isAuthorOf(request.resource);
-			allow delete: if isAuthorOf(resource);
-		}
-
 		match /users/{user} {
 			allow read;
 
 			allow create: if isOwnerOf(request.resource);
-			allow update: if isOwnerOf(resource) && isOwnerOf(request.resource);
-			allow delete: if isOwnerOf(resource);
+			allow update, delete: if isOwnerOf(resource);
 		}
 	}
 }

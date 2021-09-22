@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { Switch, Link, Route } from "react-router-dom";
+import { Switch, Link, Route, useLocation } from "react-router-dom";
 
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useCollectionData, useDocumentData } from "react-firebase-hooks/firestore";
@@ -29,6 +29,7 @@ import Popup from 'reactjs-popup';
 
 import "./index.scss";
 import LoadingMessage from "./loading-messages";
+import Editor from "../Editor";
 
 function CreateNote() {
 	const add = () => createNote(auth.currentUser, {});		
@@ -39,26 +40,6 @@ function CreateNote() {
 		>
 			Create Note
 		</button>
-	);
-}
-
-function Tag({ tag }) {
-	const [active, setActive] = useState(false);
-
-	const toggleActive = () => {
-		setActive(!active);
-	};
-
-	return (
-		<div
-			className={`
-				note-tag
-				${active ? "--active" : ""}
-			`}
-			onClick={toggleActive}
-		>
-			#{tag}
-		</div>
 	);
 }
 
@@ -74,7 +55,7 @@ function NoteOps({ note }) {
 	};
 	const visibility = () => {
 		const publicAccess = !note.publicAccess;
-		modifyNoteMetadata(auth.currentUser.uid, note.id, {
+		modifyNoteMetadata(auth.currentUser, note.id, {
 			publicAccess
 		});
 	};
@@ -142,7 +123,7 @@ function Note({ note, status }) {
 				</div>
 			</div>
 			<div className="note-operations">
-				<Link to={`/note/${note.id}`} className="edit-link">
+				<Link to={`?note=${note.id}`} className="edit-link">
 					<FontAwesomeIcon icon={faPen} /> Edit
 				</Link>
 				<DeleteNotePopup note={note}/>
@@ -164,7 +145,7 @@ function NotesListing() {
 		);
 	
 		return (
-			<div>
+			<>
 				<SignOut />
 				<div className="user-notes-title">
 					{auth.currentUser.displayName}'s Notes:
@@ -180,14 +161,14 @@ function NotesListing() {
 				</div>
 				{loading && <div className="notes-loader">{LoadingMessage()}</div>}
 				{error && `ERROR: ${JSON.stringify(error)}`}
-			</div>
+			</>
 		);
 	} else return (null);
 }
 
 function SignIn() {
 	return (
-		<div>
+		<>
 			<p> Welcome! </p>
 			<button
 				className="sign-in-button"
@@ -195,7 +176,7 @@ function SignIn() {
 			>
 				Sign In with Google
 			</button>
-		</div>
+		</>
 	);
 }
 
@@ -210,11 +191,18 @@ function SignOut() {
 	);
 }
 
+function useQuery() {
+	return new URLSearchParams(useLocation().search).get("note");
+}
+
 export default function App() {
 	const [user] = useAuthState(auth);
+	const noteID = useQuery();
+
 	return (
-		<div>
-			{user ? <NotesListing /> : <SignIn />}
-		</div>
+		<>{noteID
+			? <Editor user={user} noteID={noteID} />
+			: user ? <NotesListing /> : <SignIn />
+		}</>
 	);
 }

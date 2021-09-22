@@ -1,36 +1,43 @@
 .cm-s-theme-dark.CodeMirror {
-	border: 2px solid #3f454a;
-	background-color: #0F111A;
-	color: #b6c0df;
+	background-color: var(--dark);
+	color: var(--f);
 	line-height: 2;
 	font-family: Consolas, "Lucida Console", Monaco, monospace;
+	border: 2px solid transparent;
 }
+
 .cm-s-theme-dark.CodeMirror-focused {
-	border: 2px solid #abb5e2;
+	border-color: var(--f);
 }
 
 .cm-s-theme-dark .CodeMirror-gutters {
-	background: #0F111A;
-	color: #464B5D;
-	border: none;
+	background: var(--dark);
+	border-right: 2px solid var(--bg);
+	padding-right: 0.5rem;
 }
 
 .cm-s-theme-dark .CodeMirror-guttermarker,
 .cm-s-theme-dark .CodeMirror-guttermarker-subtle,
 .cm-s-theme-dark .CodeMirror-linenumber {
-	color: #464B5D;
+	color: var(--primary-light);
+	opacity: 0.5;
+}
+
+.cm-s-theme-dark.CodeMirror pre.CodeMirror-line {
+	padding-left: 0.25rem;
 }
 
 .cm-s-theme-dark .CodeMirror-cursor {
-	background-color: #ffc75e;
-	border: 0.8px solid #ffc75e;
+	background-color: var(--primary-light);
+	border: 0.8px solid var(--primary-light);
 	border-radius: 1px;
 	margin-left: -0.5px;
 	transform: scaleY(0.85);
 	animation: cursor-expand 1s ease 0.5s infinite;
 }
 @keyframes cursor-expand {
-	from, to {
+	from,
+	to {
 		transform: scaleY(0.85);
 	}
 	50% {
@@ -54,25 +61,26 @@
 }
 
 .cm-s-theme-dark .CodeMirror-line::selection,
-.cm-s-theme-dark .CodeMirror-line>span::selection,
-.cm-s-theme-dark .CodeMirror-line>span>span::selection {
+.cm-s-theme-dark .CodeMirror-line > span::selection,
+.cm-s-theme-dark .CodeMirror-line > span > span::selection {
 	background: rgba(128, 203, 196, 0.2);
 }
 
 .cm-s-theme-dark .CodeMirror-activeline-background {
-	background: rgba(255, 255, 255, 0.123);
+	background: var(--f);
+	opacity: 0.1;
 }
 
 .cm-s-theme-dark .cm-keyword {
-	color: #C792EA;
+	color: #c792ea;
 }
 
 .cm-s-theme-dark .cm-operator {
-	color: #89DDFF;
+	color: #89ddff;
 }
 
 .cm-s-theme-dark .cm-variable-2 {
-	color: #EEFFFF;
+	color: #eeffff;
 }
 
 .cm-s-theme-dark .cm-variable-3,
@@ -81,23 +89,23 @@
 }
 
 .cm-s-theme-dark .cm-builtin {
-	color: #FFCB6B;
+	color: #ffcb6b;
 }
 
 .cm-s-theme-dark .cm-atom {
-	color: #F78C6C;
+	color: #f78c6c;
 }
 
 .cm-s-theme-dark .cm-number {
-	color: #FF5370;
+	color: #ff5370;
 }
 
 .cm-s-theme-dark .cm-def {
-	color: #82AAFF;
+	color: #82aaff;
 }
 
 .cm-s-theme-dark .cm-string {
-	color: #C3E88D;
+	color: #c3e88d;
 }
 
 .cm-s-theme-dark .cm-string-2 {
@@ -117,24 +125,24 @@
 }
 
 .cm-s-theme-dark .cm-meta {
-	color: #FFCB6B;
+	color: #ffcb6b;
 }
 
 .cm-s-theme-dark .cm-attribute {
-	color: #C792EA;
+	color: #c792ea;
 }
 
 .cm-s-theme-dark .cm-property {
-	color: #C792EA;
+	color: #c792ea;
 }
 
 .cm-s-theme-dark .cm-qualifier {
-	color: #DECB6B;
+	color: #decb6b;
 }
 
 .cm-s-theme-dark .cm-variable-3,
 .cm-s-theme-dark .cm-type {
-	color: #DECB6B;
+	color: #decb6b;
 }
 
 .cm-s-theme-dark .cm-merit {
@@ -146,8 +154,8 @@
 }
 
 .cm-s-theme-dark .cm-error {
-	color: rgba(255, 255, 255, 1.0);
-	background-color: #FF5370;
+	color: rgba(255, 255, 255, 1);
+	background-color: #ff5370;
 }
 
 .cm-s-theme-dark .CodeMirror-matchingbracket {
