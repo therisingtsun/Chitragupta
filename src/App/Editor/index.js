@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 import { Controlled as CodeMirror } from "react-codemirror2";
 import "codemirror/addon/selection/active-line";
@@ -9,31 +9,51 @@ import "./CodeMirror/base.css";
 import "./CodeMirror/theme-dark.css";
 import CodeMirrorOptions from "./CodeMirror/options";
 
-import { useDocumentData } from "react-firebase-hooks/firestore";
-import { useDownloadURL } from "react-firebase-hooks/storage";
-import { db, storage } from "../Firebase/firebase-operations";
+import {
+	doc
+} from "firebase/firestore";
+import {
+	ref
+} from "firebase/storage";
+import {
+	useAuth,
+	useFirestore,
+	useFirestoreDocData,
+	useStorage,
+	useStorageDownloadURL
+} from "reactfire";
+
+import {
+	modifyNoteContent,
+	modifyNoteMetadata
+} from "../Firebase/firebase-operations";
 
 import "./index.scss";
 import Toolbar from "./Toolbar";
 import Preview from "./Preview";
 
-function Editor({ user, note, noteID }) {
+function Editor({ note, noteID }) {
+	const auth = useAuth();
+	const db = useFirestore();
+	const storage = useStorage();
+
 	const [noteName, setNoteName] = useState(note.name);
 	const [tags, setTags] = useState(note.tags);
 	const [tagString, setTagString] = useState(note.tags.join(" "));
 	const [editorText, setEditorText] = useState("Loading…");
+
+	const editAccess = auth.currentUser?.uid === note.author;
+
+	const { data: url } = useStorageDownloadURL(ref(storage, `${note.author}/${noteID}.md`));
 	
-	const editAccess = user.uid === note.author;
-	
-	const urlRef = storage.ref(`${note.author}/${noteID}.md`);
-	const [url, urlLoading, urlError] = useDownloadURL(urlRef);
 	const [contentLoaded, setContentLoaded] = useState(false);
 	
 	if (url && !contentLoaded) {
 		const xhr = new XMLHttpRequest();
 		xhr.responseType = "text";
-		xhr.onload = (event) => {
-			CMEditor?.current?.editor.setValue(xhr.response);
+		xhr.onload = (event) => {			
+			// CMEditor?.current?.editor.setValue(xhr.response);
+			setEditorText(xhr.response);
 			setContentLoaded(true);
 		};
 		xhr.open("GET", url);
@@ -46,19 +66,50 @@ function Editor({ user, note, noteID }) {
 
 	function onNoteNameChange(e) {
 		if (editAccess) {
-			const n = e.target.value;
-			if (n.length <= 256) {
-				setNoteName(n);
+			setNoteName(e.target.value);
+		}
+	}
+	function onNoteNameBlur(e) {
+		if (editAccess) {
+			const name = e.target.value.trim();
+			if (name.length > 0 && name.length <= 256 && name !== note.name) {
+				setNoteName(name);
+				modifyNoteMetadata(auth, db, storage, noteID, { name });
+			} else {
+				setNoteName(note.name);
 			}
 		}
 	}
+
 	function onTagstringChange(e) {
 		const t = e.target.value;
 		setTagString(t);
 		setTags(t.trim().split(/\s+/).filter(s => s.length));
 	}
+	function onTagStringBlur(e) {
+		const t = e.target.value.trim();
+		const tags = t.split(/\s+/).filter(s => s.length);
+		if (t.length > 0 && t.length <= 256 && t !== note.tags.join(" ")) {
+			setTagString(t);
+			setTags(tags);
+			modifyNoteMetadata(auth, db, storage, noteID, { tags });
+		} else {
+			setTagString(note.tags.join(" "));
+			setTags(note.tags);
+		}
+	}
+
 	function onEditorChange(editor, data, value) {
 		setEditorText(value);
+	}
+	function onEditorBlur(editor) {
+		const t = editor.doc.getValue();
+		if (t !== editorText) {
+			setEditorText(t);
+			modifyNoteContent(auth, db, storage, noteID, {
+				publicAccess: note.publicAccess
+			}, t);
+		}
 	}
 
 	if (!editAccess && !note.publicAccess) {
@@ -67,15 +118,20 @@ function Editor({ user, note, noteID }) {
 		<div className="note-view">
 			<div className="note-header">
 				<input
+					maxLength="256"
+					disabled={!editAccess}
 					className="title-input"
 					value={noteName}
 					onChange={onNoteNameChange}
+					onBlur={onNoteNameBlur}
 				/>
 				<div className="note-tags">
 					{editAccess && <input
+						maxLength="256"
 						className="tags-input"
 						value={tagString}
 						onChange={onTagstringChange}
+						onBlur={onTagStringBlur}
 					/>}
 					<div className="tags-list">
 						{tags?.map((tag, i) => (<div key={i}>#{tag}</div>))}
@@ -86,7 +142,6 @@ function Editor({ user, note, noteID }) {
 				<Toolbar
 					previewVisibility={[previewVisible, setPreviewVisible]}
 					editorReference={CMEditor}
-					user={user}
 					note={note}
 					noteID={noteID}
 					editAccess={editAccess}
@@ -101,6 +156,7 @@ function Editor({ user, note, noteID }) {
 							...CodeMirrorOptions
 						}}
 						onBeforeChange={onEditorChange}
+						onBlur={onEditorBlur}
 						ref={CMEditor}
 					/>
 				</div>
@@ -112,15 +168,25 @@ function Editor({ user, note, noteID }) {
 	);
 }
 
-export default function NoteLoader({ user, noteID }) {	
-	const noteRef = db.collection("notes").doc(noteID);
-	const [note, loading, error] = useDocumentData(noteRef);
+export default function EditorLoader({ noteID }) {
+	const auth = useAuth();
+	const db = useFirestore();
 
-	return (
-		<>
-			{note && (note.publicAccess || user.uid === note.author) && <Editor user={user} note={note} noteID={noteID} />}
-			{loading && "Loading…"}
-			{error && "Error"}
-		</>
-	);
+	const { status, data: note, error } = useFirestoreDocData(doc(db, "notes", noteID));
+
+	switch (status) {
+		case "success": {
+			if (note && (note.publicAccess || auth.currentUser?.uid === note.author)) {
+				return <Editor note={note} noteID={noteID} />;
+			}
+			else return "No permission."
+		}
+		case "loading": {
+			return "Loading…";
+		}
+		case "error": {
+			console.error(error);
+			return "An error has ocurred! Check the console for more details.";
+		}
+	}
 }

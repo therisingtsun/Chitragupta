@@ -1,27 +1,31 @@
-import React, { useRef, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-
-import { useAuthState } from "react-firebase-hooks/auth";
-import { useCollectionData } from "react-firebase-hooks/firestore";
+import React, { useEffect, useState } from "react";
+import { Link, useLocation, Route, Switch, Redirect } from "react-router-dom";
 
 import {
-	auth,
-	db,
-	signInWith,
-
+	getRedirectResult
+} from "firebase/auth";
+import {
+	collection,
+	query,
+	where,
+	orderBy,
+} from "firebase/firestore";
+import {
+	useAuth,
+	useFirestore,
+	useFirestoreCollectionData,
+	useStorage,
+	useUser
+} from "reactfire";
+import {
+	signInWithGoogle,
 	createNote,
 	deleteNote,
-	modifyNoteMetadata
+	modifyNoteMetadata,
+	postSignIn
 } from "./Firebase/firebase-operations";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-	faLock,
-	faUnlockAlt,
-	faTrash,
-	faPen,
-	faPlus,
-} from '@fortawesome/free-solid-svg-icons'
+import MI from "./MaterialIcons";
 
 import Popup from 'reactjs-popup';
 
@@ -30,7 +34,11 @@ import LoadingMessage from "./loading-messages";
 import Editor from "./Editor";
 
 function NewNotePopup() {
-	const add = () => createNote(auth.currentUser, { name: noteName });
+	const auth = useAuth();
+	const db = useFirestore();
+	const storage = useStorage();
+
+	const add = () => createNote(auth, db, storage, { name: noteName });
 	const [noteName, setNoteName] = useState("New Note");
 
 	function onChange(e) {
@@ -47,7 +55,7 @@ function NewNotePopup() {
 	return (
 		<Popup trigger={
 			<Link to="/" className="create-link">
-				<FontAwesomeIcon icon={faPlus} /> Create new Note
+				<MI className="--mr" icon="library_add" /> Note
 			</Link>
 		} modal>
 			{close => (
@@ -79,12 +87,16 @@ function NewNotePopup() {
 }
 
 function DeleteNotePopup({ note }) {
-	const remove = () => deleteNote(auth.currentUser, note.id);
+	const auth = useAuth();
+	const db = useFirestore();
+	const storage = useStorage();
+
+	const remove = () => deleteNote(auth, db, storage, note.id);
 
 	return (
 		<Popup trigger={
-			<Link to="/" className="delete-link">
-				Delete <FontAwesomeIcon icon={faTrash} />
+			<Link to="/" className="delete-link --right">
+				Delete <MI icon="delete" />
 			</Link>
 		} modal>
 			{close => (
@@ -107,76 +119,95 @@ function DeleteNotePopup({ note }) {
 }
 
 function Note({ note }) {
+	const auth = useAuth();
+	const db = useFirestore();
+	const storage = useStorage();
+
 	const [noteName, setNoteName] = useState(note.name);
-	const blurEvent = async e => {
+
+	function onChange(e) {
+		const n = e.target.value;
+		if (n.length <= 256) {
+			setNoteName(n);
+		}
+	}
+	async function onBlur(e) {
 		const name = e.target.value.trim();
-		if (name && name !== note.name) {
-			await modifyNoteMetadata(auth.currentUser, note.id, { name });
+		if (name.length > 0 && name.length < 256 && name !== note.name) {
+			setNoteName(name);
+			await modifyNoteMetadata(auth, db, storage, note.id, { name });
+		} else {
+			setNoteName(note.name);
 		}
 	}
 	return (
 		<div className="note-card">
 			<div className="note-info">
-				<input type="text" className="note-name" 
-				onChange={(e) => setNoteName(e.target.value)}
-				onBlur={blurEvent} value={noteName}/>
+				<input className="note-name" onChange={onChange} onBlur={onBlur} value={noteName} />
 				<div className="visibility-icon">
 					{note.publicAccess ? "Public" : "Private"}{" "}
-					<FontAwesomeIcon icon={note.publicAccess ? faUnlockAlt : faLock} />
+					<MI icon={note.publicAccess ? "lock_open" : "lock"} />
 				</div>
 			</div>
 			<div className="note-operations">
 				<Link to={`?note=${note.id}`} className="edit-link">
-					<FontAwesomeIcon icon={faPen} /> Edit
+					<MI icon="edit" /> Edit
 				</Link>
-				<DeleteNotePopup note={note}/>
+				<DeleteNotePopup note={note} />
 			</div>
 		</div>
 	);
 }
 
 function NotesListing() {
-	if (auth.currentUser) {
-		const [notes, loading, error] = useCollectionData(
-			db.collection("notes")
-				.where("author", "==", auth.currentUser.uid)
-				.orderBy("modified", "desc")
-			, {
-				idField: "id"
-			}
-		);
+	const auth = useAuth();
+	const db = useFirestore();
 
-		if (notes) {
+	const { status, data: notes, error } = useFirestoreCollectionData(query(
+		collection(db, "notes"),
+		where("author", "==", auth.currentUser.uid),
+		orderBy("modified", "desc")
+	), {
+		idField: "id"
+	});
+
+	switch (status) {
+		case "success": {
 			return notes.length
 				? <div className="notes-listing">{
-					notes?.map(n => <Note key={n.id} note={n} />)
+					notes.map(n => <Note key={n.id} note={n} />)
 				}</div>
 				: <div className="notes-message">
 					<p> No notes ;-; </p>
 					<p> Create one? </p>
 				</div>;
-		} else if (loading) {
+		}
+		case "loading": {
 			return <div className="notes-message">
 				<p>{
 					LoadingMessage()
 				}</p>
 			</div>;
-		} else if (error) {
+		}
+		case "error": {
 			console.error(error);
 			return <div className="notes-message">
-				<p> An error ocurred! Check the console for more details. </p>
+				<p> An error has ocurred! Check the console for more details. </p>
 			</div>;
-		} else return (null);
-	} else return (null);
+		}
+	}
 }
 
 function SignIn() {
+	const auth = useAuth();
+
 	return (
 		<>
 			<h1> Welcome! </h1>
-			<Link to="/"
+			<Link 
+				to="/signin"
 				className="sign-in-button"
-				onClick={signInWith}
+				onClick={() => signInWithGoogle(auth)}
 			>
 				Sign In with Google
 			</Link>
@@ -184,13 +215,43 @@ function SignIn() {
 	);
 }
 
+function SignInHandler() {
+	const auth = useAuth();
+	const db = useFirestore();
+	const storage = useStorage();
+
+	const [status, setStatus] = useState("loading");
+
+	useEffect(() => () => {});
+
+	getRedirectResult(auth)
+		.then(cred => {
+			if (cred) {
+				return postSignIn(auth, db, storage, cred.user);
+			}
+		})
+		.then(() => {
+			setStatus("success");
+		});
+	
+	switch (status) {
+		case "success": {
+			return <Redirect to="/" />;
+		}
+		case "loading": {
+			return "Loading…";
+		}
+	}
+}
+
 function SignOut() {
-	return auth.currentUser && (
+	const auth = useAuth();
+	return (
 		<Link to="/"
 			className="sign-out-button"
 			onClick={() => auth.signOut()}
 		>
-			Sign out
+			Sign out <MI className="--ml" icon="logout" />
 		</Link>
 	);
 }
@@ -199,26 +260,40 @@ function useQuery() {
 	return new URLSearchParams(useLocation().search).get("note");
 }
 
-export default function App() {
-	const [user] = useAuthState(auth);
+function App() {
+	const { data: user } = useUser();	
 	const noteID = useQuery();
 
 	return (
 		<>{noteID
-			? <Editor user={user} noteID={noteID} />
+			? <Editor noteID={noteID} />
 			: user
 				? <>
 					<h1 className="user-notes-title">
-						{auth.currentUser.displayName}'s Notes:
+						{user.displayName}'s Notes:
 					</h1>
 					<div className="user-actions">
-						<SignOut />
 						<NewNotePopup />
+						<SignOut />
 					</div>
 					<div className="status-indicator"></div>
 					<NotesListing />
 				</>
 				: <SignIn />
 		}</>
+	);
+}
+
+export default function AppRouter() {
+
+	return (
+		<Switch>
+			<Route path="/signin">
+				<SignInHandler />
+			</Route>
+			<Route path="/">
+				<App />
+			</Route>
+		</Switch>
 	);
 }

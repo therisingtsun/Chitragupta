@@ -59,8 +59,12 @@
 			}
 		
 			.visibility-icon {
+				display: flex;
+				flex-flow: row nowrap;
+				align-items: center;
+				justify-content: flex-end;
+				
 				flex-grow: 1;
-				text-align: right;
 				opacity: 0.25;
 			}
 		}

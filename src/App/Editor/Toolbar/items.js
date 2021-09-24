@@ -1,20 +1,3 @@
-import {
-	faBold,
-	faItalic,
-	faStrikethrough,
-	faHeading,
-	faListUl,
-	faImage,
-	faQuoteLeft,
-	faPlusCircle,
-	faMinusCircle,
-	faCode,
-	faUndo,
-	faRedo,
-	faShareAlt,
-	faLink,
-} from "@fortawesome/free-solid-svg-icons";
-
 import ClipboardJS from "clipboard";
 
 import { lineTransformer, wordTransformer } from "./transformer-methods";
@@ -25,7 +8,7 @@ function CMCommandRunner(editor, fn) {
 
 export default [
 	{
-		title: "Bold", icon: faBold, runner: wordTransformer,
+		title: "Bold", icon: "format_bold", runner: wordTransformer,
 		action(text) {
 			const boldRule = /(\*\*)((?:.|\r?\n)*?)\1/;
 			const transformed = boldRule.test(text)
@@ -36,7 +19,7 @@ export default [
 		}
 	},
 	{
-		title: "Italic", icon: faItalic, runner: wordTransformer,
+		title: "Italic", icon: "format_italic", runner: wordTransformer,
 		action(text) {
 			const italicRule = /(_)((?:.|\r?\n)*?)\1/;
 			const transformed = italicRule.test(text)
@@ -47,7 +30,7 @@ export default [
 		} 
 	},
 	{
-		title: "Strikethrough", icon: faStrikethrough, runner: wordTransformer,
+		title: "Strikethrough", icon: "format_strikethrough", runner: wordTransformer,
 		action(text) {
 			const strikeRule = /~~((?:.|\r?\n)*?)~~/;
 			const transformed = strikeRule.test(text)
@@ -58,7 +41,7 @@ export default [
 		}
 	},
 	{
-		title: "Code", icon: faCode, runner: wordTransformer,
+		title: "Code", icon: "code", runner: wordTransformer,
 		action(text) {
 			const codeRule = /```((?:.|\r?\n)*?)```/;
 			const transformed = codeRule.test(text)
@@ -69,7 +52,7 @@ export default [
 		}
 	},
 	{
-		title: "Link", icon: faLink, runner: wordTransformer,
+		title: "Link", icon: "link", runner: wordTransformer,
 		action(text) {
 			const transformed = `[${text}](url-here)`;
 			const cursor = text.length ? 1 : transformed.length - 1;
@@ -77,7 +60,7 @@ export default [
 		}
 	},
 	{
-		title: "Image Embed", icon: faImage, runner: wordTransformer,
+		title: "Image Embed", icon: "insert_photo", runner: wordTransformer,
 		action(text) {
 			const transformed = `![${text}](image-url-here)`;
 			const cursor = text.length ? 2 : transformed.length - 2;
@@ -86,7 +69,7 @@ export default [
 	},
 
 	{
-		title: "Heading", icon: faHeading, runner: lineTransformer,
+		title: "Heading", icon: "title", runner: lineTransformer,
 		action(line) {
 			const noHeadingRule = /^(?:([^#]+)|$)/;
 			const headingRule = /^(#{1,5})\s(.*)/;
@@ -99,7 +82,7 @@ export default [
 		}
 	},
 	{
-		title: "List", icon: faListUl, runner: lineTransformer,
+		title: "List", icon: "format_list_bulleted", runner: lineTransformer,
 		action(line) {
 			const listRule = /^(\s*)-\s(.*)/;
 			return listRule.test(line)
@@ -108,7 +91,7 @@ export default [
 		}
 	},
 	{
-		title: "Quote", icon: faQuoteLeft, runner: lineTransformer,
+		title: "Quote", icon: "format_quote", runner: lineTransformer,
 		action(line) {
 			const quoteRule = /^(\s*)>\s?(.*)/;
 			return quoteRule.test(line)
@@ -117,7 +100,7 @@ export default [
 		}
 	},
 	{
-		title: "Merit", icon: faPlusCircle, runner: lineTransformer,
+		title: "Merit", icon: "add_circle_outline", runner: lineTransformer,
 		action(line) {
 			const meritRule = /^\((\+|-)\)\s?(.*)/;
 			const match = meritRule.exec(line);
@@ -129,7 +112,7 @@ export default [
 		}
 	},
 	{
-		title: "Demerit", icon: faMinusCircle, runner: lineTransformer,
+		title: "Demerit", icon: "remove_circle_outline", runner: lineTransformer,
 		action(line) {
 			const demeritRule = /^\((\+|-)\)\s?(.*)/;
 			const match = demeritRule.exec(line);
@@ -142,20 +125,20 @@ export default [
 	},
 
 	{
-		title: "Undo", icon: faUndo, runner: CMCommandRunner,
+		title: "Undo", icon: "undo", runner: CMCommandRunner,
 		action(editor) {
 			editor.execCommand("undo");
 		}
 	},
 	{
-		title: "Redo", icon: faRedo, runner: CMCommandRunner,
+		title: "Redo", icon: "redo", runner: CMCommandRunner,
 		action(editor) {
 			editor.execCommand("redo");
 		}
 	},
 
 	{
-		title: "Share", icon: faShareAlt, runner: (_, fn) => fn(),
+		title: "Share", icon: "share", runner: (_, fn) => fn(),
 		action() {
 			const b = document.createElement("button");
 			new ClipboardJS(b, {

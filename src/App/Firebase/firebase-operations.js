@@ -1,53 +1,61 @@
-import firebase from "firebase/compat/app";
-import "firebase/compat/auth";
-import "firebase/compat/firestore";
-import "firebase/compat/storage";
+import {
+	GoogleAuthProvider,
+	getRedirectResult,
+	signInWithRedirect,
+} from "firebase/auth";
+import {
+	collection,
+	doc,
+	getDoc,
+	addDoc,
+	setDoc,
+	updateDoc,
+	deleteDoc,
+	serverTimestamp
+} from "firebase/firestore";
+import {
+	ref,
+	uploadString,
+	updateMetadata,
+	deleteObject
+} from "firebase/storage";
 
-import firebaseConfig from "./firebase-config";
 import GettingStarted from "./getting-started";
 
-const app = firebase.initializeApp(firebaseConfig);
+export function signInWithGoogle(auth) {
+	const provider = new GoogleAuthProvider();
+	return signInWithRedirect(auth, provider);
+}
 
-export const auth = firebase.auth(app);
-auth.useEmulator("http://localhost:9099");
-
-export const db = firebase.firestore(app);
-db.useEmulator("localhost", 8080);
-
-export const storage = firebase.storage(app);
-storage.useEmulator("localhost", 9199);
-
-export async function signInWith() {
-	const provider = new firebase.auth.GoogleAuthProvider();
-	const { user } = await auth.signInWithPopup(provider);
-	const userRef = db.collection("users").doc(user.uid);
-	const root = await userRef.get();
-	if (!root.exists) {
-		userRef.set({
+export async function postSignIn(auth, db, storage, user) {
+	const userRef = doc(db, "users", user.uid);
+	const root = await getDoc(userRef);
+	if (!root.exists()) {
+		setDoc(userRef, {
 			tier: "free"
 		});
-		createNote(user, {
+		createNote(auth, db, storage, {
 			name: "Getting started",
 			tags: ["tutorial", "guide", "this-is-a-long-tag-as-an-example"],
 		}, GettingStarted(user.displayName));
 	}
 }
 
-export async function createNote(user, noteData, content = "") {
-	if (user) {
+export async function createNote(auth, db, storage, noteData, content = "") {
+	if (auth.currentUser) {
 		const data = Object.assign({
-			author: user.uid,
-			created: firebase.firestore.FieldValue.serverTimestamp(),
-			modified: firebase.firestore.FieldValue.serverTimestamp(),
+			author: auth.currentUser.uid,
+			created: serverTimestamp(),
+			modified: serverTimestamp(),
 			publicAccess: false,
 			name: "New Note",
-			tags: []
+			tags: ["add-tags-here"]
 		}, noteData);
 
-		const note = await db.collection("notes").add(data);
+		const note = await addDoc(collection(db, "notes"), data);
 
 		if (typeof content === "string") {
-			uploadNote(user, note.id, data, content);
+			uploadNote(auth, db, storage, note.id, data, content);
 		}
 
 		return [
@@ -59,37 +67,41 @@ export async function createNote(user, noteData, content = "") {
 	}
 }
 
-export async function uploadNote(user, noteID, noteData, content) {
+export async function uploadNote(auth, db, storage, noteID, noteData, content) {
 	if (typeof content === "string") {
-		if (user) {
+		if (auth.currentUser) {
 			const metadata = {
 				contentType: "text/plain",
-				customMetadata: {}
+				customMetadata: {
+					publicAccess: noteData.publicAccess ?? false
+				}
 			};
-			if (noteData.hasOwnProperty("publicAccess")) metadata.customMetadata["publicAccess"] = noteData.publicAccess;
 
-			return storage.ref().child(`${user.uid}/${noteID}.md`).putString(content, "raw", metadata);
+			return uploadString(
+				ref(storage, `${auth.currentUser.uid}/${noteID}.md`),
+				content, "raw", metadata
+			);
 		} else {
 			// no account usage goes here
 		}
 	} else return null;
 }
 
-export async function modifyNoteContent(user, noteID, noteData, content) {
+export async function modifyNoteContent(auth, db, storage, noteID, noteData, content) {
 	if (typeof content === "string") {
-		if (user) {
+		if (auth.currentUser) {
 			const data = Object.assign({
-				modified: firebase.firestore.FieldValue.serverTimestamp()
+				modified: serverTimestamp()
 			}, noteData);
 			
-			const uploadTask = (await Promise.all([			
-				uploadNote(user, noteID, data, content),
-				db.collection("notes").doc(noteID).update(data),
+			const uploadResult = (await Promise.all([			
+				uploadNote(auth, db, storage, noteID, data, content),
+				updateDoc(doc(db, "notes", noteID), data),
 			]))[0];
 
 			return [
 				Object.assign({ id: noteID }, data),
-				uploadTask
+				uploadResult
 			];
 		} else {
 			// no account usage goes here
@@ -97,26 +109,28 @@ export async function modifyNoteContent(user, noteID, noteData, content) {
 	} else return null;
 }
 
-export async function modifyNoteMetadata(user, noteID, noteData) {
-	if (user) {
+export async function modifyNoteMetadata(auth, db, storage, noteID, noteData) {
+	if (auth.currentUser) {
 		const data = Object.assign({}, noteData);
 
-		await db.collection("notes").doc(noteID).update(data);
-		if (noteData.hasOwnProperty("publicAccess")) await storage.ref(`${user.uid}/${noteID}.md`).updateMetadata({
+		await updateDoc(doc(db, "notes", noteID), data);
+		updateMetadata
+		if (noteData.hasOwnProperty("publicAccess")) 
+		await updateMetadata(ref(storage, `${auth.currentUser.uid}/${noteID}.md`), {
 			customMetadata: {
 				publicAccess: noteData.publicAccess
 			}
-		});
+		})
 	} else {
 		// no account usage goes here
 	}
 }
 
-export async function deleteNote(user, noteID) {
-	if (user) {
+export async function deleteNote(auth, db, storage, noteID) {
+	if (auth.currentUser) {
 		return Promise.all([
-			db.collection("notes").doc(noteID).delete(),
-			storage.ref(`${user.uid}/${noteID}.md`).delete()
+			deleteDoc(doc(db, "notes", noteID)),
+			deleteObject(ref(storage, `${auth.currentUser.uid}/${noteID}.md`)),
 		]);
 	} else {
 		// no account usage goes here

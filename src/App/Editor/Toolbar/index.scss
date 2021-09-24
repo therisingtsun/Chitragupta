@@ -6,6 +6,11 @@
 	user-select: none;
 
 	.read-only {
+		display: flex;
+		flex-flow: row nowrap;
+		align-items: center;
+		justify-content: flex-start;
+		
 		color: var(--f);
 		opacity: 0.5;
 		padding: 0 1rem;
@@ -19,6 +24,10 @@
 		outline: none;
 		border: none;
 		cursor: pointer;
+
+		> .material-icons {
+			font-size: 1.25rem;
+		}
 		
 		&:hover {
 			color: white;
