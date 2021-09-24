@@ -32,8 +32,8 @@ export default function GettingStarted(name) {
 			`|  One  | Two  |`,
 			`| Three | Four |`
 		].join("\n"),
-		`That is all fun, but Chitragupta wouldn't be complete without a way to keep track of merits, would it?`,
-		`(+) Introducing Merits. Add a \`(+)\` at the start of a line to begin with a merit. Add positive points about something in these sections.`,
+		`That is fun and all, but Chitragupta wouldn't be complete without a way to keep track of the good and the bad, would it?`,
+		`(+) Introducing Merits. Add a \`(+)\` to the start of a line to begin with a merit. Add positive points about something in these sections.`,
 		`(-) And \`(-)\` to begin with a demerit. The point of these are to just give easy-to-notice regions in the entire document.`,
 		`And… that's about it! Go write your own notes now!`
 	].join("\n\n");

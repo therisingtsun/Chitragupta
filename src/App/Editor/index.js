@@ -1,27 +1,27 @@
 import React, { useState, useRef } from "react";
 
-import "./index.scss";
-import Preview from "./Preview";
-
-import "./MarkdownChitragupta";
-import "./CodeMirror/theme-dark.css";
-
-import CodeMirror from "./CodeMirror";
+import { Controlled as CodeMirror } from "react-codemirror2";
 import "codemirror/addon/selection/active-line";
 import "codemirror/keymap/sublime";
 
-import Toolbar from "./Toolbar";
+import "./MarkdownChitragupta";
+import "./CodeMirror/base.css";
+import "./CodeMirror/theme-dark.css";
+import CodeMirrorOptions from "./CodeMirror/options";
+
 import { useDocumentData } from "react-firebase-hooks/firestore";
 import { useDownloadURL } from "react-firebase-hooks/storage";
 import { db, storage } from "../Firebase/firebase-operations";
 
-const loadingString = "Loading…";
+import "./index.scss";
+import Toolbar from "./Toolbar";
+import Preview from "./Preview";
 
 function Editor({ user, note, noteID }) {
 	const [noteName, setNoteName] = useState(note.name);
 	const [tags, setTags] = useState(note.tags);
 	const [tagString, setTagString] = useState(note.tags.join(" "));
-	const [editorText, setEditorText] = useState(loadingString);
+	const [editorText, setEditorText] = useState("Loading…");
 	
 	const editAccess = user.uid === note.author;
 	
@@ -51,15 +51,15 @@ function Editor({ user, note, noteID }) {
 				setNoteName(n);
 			}
 		}
-	};
+	}
 	function onTagstringChange(e) {
 		const t = e.target.value;
 		setTagString(t);
 		setTags(t.trim().split(/\s+/).filter(s => s.length));
-	};
-	function onEditorChange(editor) {
-		setEditorText(editor.getValue());
-	};
+	}
+	function onEditorChange(editor, data, value) {
+		setEditorText(value);
+	}
 
 	if (!editAccess && !note.publicAccess) {
 		return "No permissun, sowwies…";
@@ -96,19 +96,11 @@ function Editor({ user, note, noteID }) {
 				<div className="note-editor">
 					<CodeMirror
 						value={editorText}
-						options={{
-							mode: "markdown-chitragupta",
-							styleActiveLine: true,
-							theme: "theme-dark",
-							indentUnit: 4,
-							indentWithTabs: true,
-							tabSize: 4,
-							lineWrapping: true,
-							cursorBlinkRate: 0,
-							keyMap: "sublime",
-							readOnly: !editAccess
+						options={{							
+							readOnly: !editAccess,
+							...CodeMirrorOptions
 						}}
-						onChange={onEditorChange}
+						onBeforeChange={onEditorChange}
 						ref={CMEditor}
 					/>
 				</div>

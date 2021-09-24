@@ -1,7 +1,8 @@
 "use strict";
 
 const path = require("path");
-const CopyPlugin = require("copy-webpack-plugin");
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = (env) => {
 	const mode = env.production ? "production" : "development";
@@ -12,21 +13,24 @@ module.exports = (env) => {
 		watch,
 		entry: "./src/index.js",
 		plugins: [
-			new CopyPlugin({
-				patterns: [
-					{
-						from: path.resolve(__dirname, "src/views/index.html"),
-						to: path.resolve(__dirname, "public/")
-					},
-				]
+			new HtmlWebpackPlugin({
+				template: path.resolve(__dirname, "./src/views/index.html"),
+			}),
+			new MiniCssExtractPlugin({
+				filename: "main.bundle.css"
 			})
 		],
 		resolve: {
-			extensions: ["*", ".js", ".jsx"]
+			extensions: ["*", ".js", ".jsx"],
+			alias: {
+				"react": "preact/compat",
+				"react-dom": "preact/compat"
+			}
 		},
 		output: {
 			path: path.resolve(__dirname, "public/"),
-			filename: "index.js"
+			filename: "[name].bundle.js",
+			chunkFilename: "[name].bundle.js",
 		},
 		module: {
 			rules: [
@@ -43,7 +47,10 @@ module.exports = (env) => {
 				{
 					test: /\.s?css$/,
 					use: [
-						"style-loader",
+						{
+							loader: MiniCssExtractPlugin.loader
+						},
+						// "style-loader",
 						"css-loader",
 						"postcss-loader",
 						"sass-loader"

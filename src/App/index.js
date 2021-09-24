@@ -20,6 +20,7 @@ import {
 	faUnlockAlt,
 	faTrash,
 	faPen,
+	faPlus,
 } from '@fortawesome/free-solid-svg-icons'
 
 import Popup from 'reactjs-popup';
@@ -28,22 +29,57 @@ import "./index.scss";
 import LoadingMessage from "./loading-messages";
 import Editor from "./Editor";
 
-function CreateNote() {
-	const add = () => createNote(auth.currentUser, {});		
+function NewNotePopup() {
+	const add = () => createNote(auth.currentUser, { name: noteName });
+	const [noteName, setNoteName] = useState("New Note");
+
+	function onChange(e) {
+		const n = e.target.value;
+		if (n.length <= 256) {
+			setNoteName(n);
+		}
+	}
+	function onBlur(e) {
+		const n = e.target.value.trim();
+		setNoteName(n);
+	}
+
 	return (
-		<button
-			className="create-note-button"
-			onClick={add}
-		>
-			Create Note
-		</button>
+		<Popup trigger={
+			<Link to="/" className="create-link">
+				<FontAwesomeIcon icon={faPlus} /> Create new Note
+			</Link>
+		} modal>
+			{close => (
+				<div className="popup-modal">
+					<p>
+						Name for new note:
+					</p>
+					<input
+						className="create-input"
+						value={noteName}
+						onChange={onChange}
+						onBlur={onBlur}
+					/>
+					<p className="confirm-para">
+						<Link to="/" onClick={() => {
+							add();
+							close();
+						}} className="confirm-link create-confirm-link">
+							Create
+						</Link>
+						<Link to="/" onClick={close}>
+							Cancel
+						</Link>
+					</p>
+				</div>
+			)}
+		</Popup>
 	);
 }
 
 function DeleteNotePopup({ note }) {
-	const remove = () => {
-		deleteNote(auth.currentUser, note.id);
-	};
+	const remove = () => deleteNote(auth.currentUser, note.id);
 
 	return (
 		<Popup trigger={
@@ -51,13 +87,13 @@ function DeleteNotePopup({ note }) {
 				Delete <FontAwesomeIcon icon={faTrash} />
 			</Link>
 		} modal>
-			{ close => (
+			{close => (
 				<div className="popup-modal">
 					<p>
 						This will permanently delete the note. Proceed?
 					</p>
-					<p className="delete-confirm-para">
-						<Link to="/" onClick={remove} className="delete-confirm-link">
+					<p className="confirm-para">
+						<Link to="/" onClick={remove} className="confirm-link delete-confirm-link">
 							Delete
 						</Link>
 						<Link to="/" onClick={close}>
@@ -70,14 +106,12 @@ function DeleteNotePopup({ note }) {
 	);
 }
 
-function Note({ note, status }) {
+function Note({ note }) {
 	const [noteName, setNoteName] = useState(note.name);
 	const blurEvent = async e => {
 		const name = e.target.value.trim();
 		if (name && name !== note.name) {
-			status.current.innerHTML = "Syncing…"
 			await modifyNoteMetadata(auth.currentUser, note.id, { name });
-			status.current.innerHTML = "All changes saved";
 		}
 	}
 	return (
@@ -102,7 +136,6 @@ function Note({ note, status }) {
 }
 
 function NotesListing() {
-	const statusRef = useRef(null);
 	if (auth.currentUser) {
 		const [notes, loading, error] = useCollectionData(
 			db.collection("notes")
@@ -112,51 +145,53 @@ function NotesListing() {
 				idField: "id"
 			}
 		);
-	
-		return (
-			<>
-				<SignOut />
-				<div className="user-notes-title">
-					{auth.currentUser.displayName}'s Notes:
-				</div>
-				<div className="status-indicator" ref={statusRef}></div>
-				<p>
-					<CreateNote />
-				</p>
-				<div className="notes-listing">
-					{notes && notes.map(n => (
-						<Note key={n.id} note={n} status={statusRef}/>
-					))}
-				</div>
-				{loading && <div className="notes-loader">{LoadingMessage()}</div>}
-				{error && `ERROR: ${JSON.stringify(error)}`}
-			</>
-		);
+
+		if (notes) {
+			return notes.length
+				? <div className="notes-listing">{
+					notes?.map(n => <Note key={n.id} note={n} />)
+				}</div>
+				: <div className="notes-message">
+					<p> No notes ;-; </p>
+					<p> Create one? </p>
+				</div>;
+		} else if (loading) {
+			return <div className="notes-message">
+				<p>{
+					LoadingMessage()
+				}</p>
+			</div>;
+		} else if (error) {
+			console.error(error);
+			return <div className="notes-message">
+				<p> An error ocurred! Check the console for more details. </p>
+			</div>;
+		} else return (null);
 	} else return (null);
 }
 
 function SignIn() {
 	return (
 		<>
-			<p> Welcome! </p>
-			<button
+			<h1> Welcome! </h1>
+			<Link to="/"
 				className="sign-in-button"
 				onClick={signInWith}
 			>
 				Sign In with Google
-			</button>
+			</Link>
 		</>
 	);
 }
 
 function SignOut() {
 	return auth.currentUser && (
-		<button
+		<Link to="/"
 			className="sign-out-button"
 			onClick={() => auth.signOut()}
 		>
 			Sign out
-		</button>
+		</Link>
 	);
 }
 
@@ -171,7 +206,19 @@ export default function App() {
 	return (
 		<>{noteID
 			? <Editor user={user} noteID={noteID} />
-			: user ? <NotesListing /> : <SignIn />
+			: user
+				? <>
+					<h1 className="user-notes-title">
+						{auth.currentUser.displayName}'s Notes:
+					</h1>
+					<div className="user-actions">
+						<SignOut />
+						<NewNotePopup />
+					</div>
+					<div className="status-indicator"></div>
+					<NotesListing />
+				</>
+				: <SignIn />
 		}</>
 	);
 }

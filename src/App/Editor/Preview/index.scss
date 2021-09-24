@@ -1,5 +1,5 @@
 .markdown-preview {
-	padding: 1rem 2rem;
+	padding: 1rem 2rem 5rem;
 
 	border-left: 2px solid var(--bg);
 	
@@ -23,7 +23,9 @@
 
 		code {
 			background-color: var(--bg-l);
-			padding: 0.1rem 0.25rem;
+			padding: 0.125rem;
+			margin: 0.125rem;
+			vertical-align: text-top;
 			border: 1px solid var(--f);
 			border-radius: var( --base-border-radius);
 		}
@@ -70,11 +72,13 @@
 		color: var(--f-l);
 		text-decoration: underline;
 		padding: 0;
+		border: none;
 		border-radius: 0;
 		user-select: text;
 
 		&:hover {
 			color: var(--primary-light);
+			background-color: transparent;
 		}
 	}
 

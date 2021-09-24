@@ -1,3 +1,10 @@
+.user-actions {
+	display: flex;
+	flex-flow: row nowrap;
+	align-items: center;
+	justify-content: space-between;
+}
+
 .notes-listing {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, 18rem);
@@ -68,10 +75,12 @@
 				width: 100%;
 			}
 	
-			// .edit-link {
-			// }
+			.edit-link {
+				margin-right: 0.25rem;
+			}
 			
 			.delete-link {
+				margin-left: 0.25rem;
 				text-align: right;
 			}
 		}
@@ -82,7 +91,7 @@
 	}
 }
 
-.notes-loader {
+.notes-message {
 	padding: 2rem;
 	margin: 2rem;
 	text-align: center;
@@ -97,8 +106,9 @@
 			border: 2px solid var(--f);
 			border-radius: var(--base-border-radius);
 			padding: 2rem;
+			font-size: 1.5rem;
 
-			.delete-confirm-para {
+			.confirm-para {
 				text-align: center;
 				margin-top: 4rem;
 				display: flex;
@@ -106,27 +116,22 @@
 				align-items: center;
 				justify-content: space-evenly;
 
+				a {
+					padding: 0.5rem 1rem;
+				}
+
 				.delete-confirm-link {
 					&:hover {
 						background-color: rgb(255, 132, 83);
 					}
 				}
+
+				.create-confirm-link {
+					&:hover {
+						background-color: rgb(134, 179, 116);
+					}
+				}
 			}
 		}
-	}
-}
-
-a {
-	background-color: transparent;
-	border-radius: var(--base-border-radius);
-	color: var(--f);
-	text-decoration: none;
-	padding: 0.25rem 0.5rem;
-	user-select: none;
-	transition: all 0.1s ease;
-	
-	&:hover {
-		background-color: var(--f);
-		color: var(--f-dark);
 	}
 }

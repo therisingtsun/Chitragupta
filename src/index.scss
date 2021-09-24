@@ -34,6 +34,45 @@ body {
 	margin: 0;
 }
 
+a {
+	background-color: transparent;
+	border: 2px solid var(--f);
+	border-radius: var(--base-border-radius);
+	color: var(--f);
+	text-decoration: none;
+	padding: 0.25rem 0.5rem;
+	user-select: none;
+	transition: all 0.1s ease;
+	
+	&:hover {
+		background-color: var(--f);
+		border-color: transparent;
+		color: var(--f-dark);
+	}
+}
+
+input {
+	color: var(--f);
+	background-color: transparent;
+	border: none;
+	border-bottom: 2px solid var(--bg-l);	
+	text-overflow: ellipsis;
+	overflow: hidden;
+	outline: none;
+	opacity: 0.75;
+	font-family: var(--f-content);
+	font-size: inherit;
+	
+	&:hover {
+		background-color: var(--bg);
+	}
+	
+	&:focus {
+		opacity: 1;
+		border-color: var(--f);
+	}
+}
+
 *, *::before, *::after {
 	box-sizing: border-box;
 }

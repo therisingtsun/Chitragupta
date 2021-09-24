@@ -2,6 +2,8 @@
 .design
 public
 
+webpack.stats.json
+
 # git
 .git/config
 
