@@ -70,12 +70,7 @@ export async function createNote(auth, db, storage, noteData, content = "") {
 export async function uploadNote(auth, db, storage, noteID, noteData, content) {
 	if (typeof content === "string") {
 		if (auth.currentUser) {
-			const metadata = {
-				contentType: "text/plain",
-				customMetadata: {
-					publicAccess: noteData.publicAccess ?? false
-				}
-			};
+			const metadata = { contentType: "text/plain" };
 
 			return uploadString(
 				ref(storage, `${auth.currentUser.uid}/${noteID}.md`),
@@ -111,16 +106,11 @@ export async function modifyNoteContent(auth, db, storage, noteID, noteData, con
 
 export async function modifyNoteMetadata(auth, db, storage, noteID, noteData) {
 	if (auth.currentUser) {
-		const data = Object.assign({}, noteData);
+		const data = Object.assign({
+			modified: serverTimestamp()
+		}, noteData);
 
 		await updateDoc(doc(db, "notes", noteID), data);
-		updateMetadata
-		if (noteData.hasOwnProperty("publicAccess")) 
-		await updateMetadata(ref(storage, `${auth.currentUser.uid}/${noteID}.md`), {
-			customMetadata: {
-				publicAccess: noteData.publicAccess
-			}
-		})
 	} else {
 		// no account usage goes here
 	}

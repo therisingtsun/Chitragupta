@@ -25,7 +25,8 @@ import {
 	postSignIn
 } from "./Firebase/firebase-operations";
 
-import MI from "./MaterialIcons";
+import MI from "./Utils/MaterialIcons";
+import Loader from "./Utils/Loader";
 
 import Popup from 'reactjs-popup';
 
@@ -239,7 +240,7 @@ function SignInHandler() {
 			return <Redirect to="/" />;
 		}
 		case "loading": {
-			return "Loading…";
+			return <Loader />;
 		}
 	}
 }
@@ -264,28 +265,30 @@ function App() {
 	const { data: user } = useUser();	
 	const noteID = useQuery();
 
-	return (
-		<>{noteID
-			? <Editor noteID={noteID} />
-			: user
-				? <>
-					<h1 className="user-notes-title">
-						{user.displayName}'s Notes:
-					</h1>
-					<div className="user-actions">
-						<NewNotePopup />
-						<SignOut />
-					</div>
-					<div className="status-indicator"></div>
-					<NotesListing />
-				</>
-				: <SignIn />
-		}</>
-	);
+	if (noteID) {
+		return <Editor noteID={noteID} />;
+	} else {
+		if (user === undefined) {
+			return <Loader />;
+		} else if (user === null) {
+			return <SignIn />;
+		} else {
+			return (<>
+				<h1 className="user-notes-title">
+					{user.displayName}'s Notes:
+				</h1>
+				<div className="user-actions">
+					<NewNotePopup />
+					<SignOut />
+				</div>
+				<div className="status-indicator"></div>
+				<NotesListing />
+			</>);
+		}
+	}
 }
 
 export default function AppRouter() {
-
 	return (
 		<Switch>
 			<Route path="/signin">

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 
 import { Controlled as CodeMirror } from "react-codemirror2";
 import "codemirror/addon/selection/active-line";
@@ -28,11 +28,16 @@ import {
 	modifyNoteMetadata
 } from "../Firebase/firebase-operations";
 
+import Timer from "../Utils/Timer";
+
 import "./index.scss";
 import Toolbar from "./Toolbar";
 import Preview from "./Preview";
+import Loader from "../Utils/Loader";
 
-function Editor({ note, noteID }) {
+const lastEdited = new Timer(() => {}, 1000).reset();
+
+function Editor({ note, noteID, content }) {
 	const auth = useAuth();
 	const db = useFirestore();
 	const storage = useStorage();
@@ -40,25 +45,9 @@ function Editor({ note, noteID }) {
 	const [noteName, setNoteName] = useState(note.name);
 	const [tags, setTags] = useState(note.tags);
 	const [tagString, setTagString] = useState(note.tags.join(" "));
-	const [editorText, setEditorText] = useState("Loading…");
+	const [editorText, setEditorText] = useState(content);
 
 	const editAccess = auth.currentUser?.uid === note.author;
-
-	const { data: url } = useStorageDownloadURL(ref(storage, `${note.author}/${noteID}.md`));
-	
-	const [contentLoaded, setContentLoaded] = useState(false);
-	
-	if (url && !contentLoaded) {
-		const xhr = new XMLHttpRequest();
-		xhr.responseType = "text";
-		xhr.onload = (event) => {			
-			// CMEditor?.current?.editor.setValue(xhr.response);
-			setEditorText(xhr.response);
-			setContentLoaded(true);
-		};
-		xhr.open("GET", url);
-		xhr.send();
-	}
 
 	const [previewVisible, setPreviewVisible] = useState(true);
 
@@ -100,16 +89,14 @@ function Editor({ note, noteID }) {
 	}
 
 	function onEditorChange(editor, data, value) {
-		setEditorText(value);
-	}
-	function onEditorBlur(editor) {
-		const t = editor.doc.getValue();
-		if (t !== editorText) {
-			setEditorText(t);
+		lastEdited.callback = function () {
+			const t = value;
 			modifyNoteContent(auth, db, storage, noteID, {
 				publicAccess: note.publicAccess
 			}, t);
-		}
+		};
+		lastEdited.reset().resume();		
+		setEditorText(value);
 	}
 
 	if (!editAccess && !note.publicAccess) {
@@ -156,7 +143,6 @@ function Editor({ note, noteID }) {
 							...CodeMirrorOptions
 						}}
 						onBeforeChange={onEditorChange}
-						onBlur={onEditorBlur}
 						ref={CMEditor}
 					/>
 				</div>
@@ -168,6 +154,30 @@ function Editor({ note, noteID }) {
 	);
 }
 
+function ContentLoader({ note, noteID }) {
+	const storage = useStorage();
+
+	const { data: url } = useStorageDownloadURL(ref(storage, `${note.author}/${noteID}.md`));
+	
+	const [content, setContent] = useState(null);
+	
+	if (url) {
+		const xhr = new XMLHttpRequest();
+		xhr.responseType = "text";
+		xhr.onload = (event) => {
+			setContent(xhr.response);
+		};
+		xhr.open("GET", url);
+		xhr.send();
+	}
+
+	if (content !== null) {
+		return <Editor note={note} content={content} noteID={noteID} />
+	} else {
+		return <Loader />;
+	}
+}
+
 export default function EditorLoader({ noteID }) {
 	const auth = useAuth();
 	const db = useFirestore();
@@ -177,12 +187,12 @@ export default function EditorLoader({ noteID }) {
 	switch (status) {
 		case "success": {
 			if (note && (note.publicAccess || auth.currentUser?.uid === note.author)) {
-				return <Editor note={note} noteID={noteID} />;
+				return <ContentLoader note={note} noteID={noteID} />;
 			}
 			else return "No permission."
 		}
 		case "loading": {
-			return "Loading…";
+			return <Loader />;
 		}
 		case "error": {
 			console.error(error);

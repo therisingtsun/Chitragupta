@@ -9,7 +9,7 @@ import {
 import ToolbarItems from "./items";
 import { modifyNoteMetadata } from "../../Firebase/firebase-operations";
 
-import MI from "../../MaterialIcons";
+import MI from "../../Utils/MaterialIcons";
 
 import "./index.scss";
 
