@@ -126,13 +126,13 @@
 
 				.delete-confirm-link {
 					&:hover {
-						background-color: rgb(255, 132, 83);
+						background-color: var(--aD);
 					}
 				}
 
 				.create-confirm-link {
 					&:hover {
-						background-color: rgb(134, 179, 116);
+						background-color: var(--aS);
 					}
 				}
 			}

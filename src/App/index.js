@@ -33,6 +33,7 @@ import Popup from 'reactjs-popup';
 import "./index.scss";
 import LoadingMessage from "./loading-messages";
 import Editor from "./Editor";
+import StatusProvider, { useStatus } from "./Utils/StatusIndicator";
 
 function NewNotePopup() {
 	const auth = useAuth();
@@ -123,6 +124,7 @@ function Note({ note }) {
 	const auth = useAuth();
 	const db = useFirestore();
 	const storage = useStorage();
+	const SM = useStatus();
 
 	const [noteName, setNoteName] = useState(note.name);
 
@@ -136,7 +138,7 @@ function Note({ note }) {
 		const name = e.target.value.trim();
 		if (name.length > 0 && name.length < 256 && name !== note.name) {
 			setNoteName(name);
-			await modifyNoteMetadata(auth, db, storage, note.id, { name });
+			SM.add(modifyNoteMetadata(auth, db, storage, note.id, { name }));
 		} else {
 			setNoteName(note.name);
 		}
@@ -266,7 +268,9 @@ function App() {
 	const noteID = useQuery();
 
 	if (noteID) {
-		return <Editor noteID={noteID} />;
+		return <StatusProvider>
+			<Editor noteID={noteID} />
+		</StatusProvider>;
 	} else {
 		if (user === undefined) {
 			return <Loader />;
@@ -281,8 +285,9 @@ function App() {
 					<NewNotePopup />
 					<SignOut />
 				</div>
-				<div className="status-indicator"></div>
-				<NotesListing />
+				<StatusProvider>
+					<NotesListing />
+				</StatusProvider>
 			</>);
 		}
 	}

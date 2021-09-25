@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 import { Controlled as CodeMirror } from "react-codemirror2";
 import "codemirror/addon/selection/active-line";
@@ -34,13 +34,23 @@ import "./index.scss";
 import Toolbar from "./Toolbar";
 import Preview from "./Preview";
 import Loader from "../Utils/Loader";
+import { useStatus } from "../Utils/StatusIndicator";
 
-const lastEdited = new Timer(() => {}, 1000).reset();
+let lastEdited = null;
 
 function Editor({ note, noteID, content }) {
 	const auth = useAuth();
 	const db = useFirestore();
 	const storage = useStorage();
+	const SM = useStatus();
+	
+	useEffect(() => {
+		lastEdited = new Timer(() => { }, 1000);
+
+		return () => {
+			lastEdited = null;
+		};
+	}, []);
 
 	const [noteName, setNoteName] = useState(note.name);
 	const [tags, setTags] = useState(note.tags);
@@ -63,7 +73,7 @@ function Editor({ note, noteID, content }) {
 			const name = e.target.value.trim();
 			if (name.length > 0 && name.length <= 256 && name !== note.name) {
 				setNoteName(name);
-				modifyNoteMetadata(auth, db, storage, noteID, { name });
+				SM.add(modifyNoteMetadata(auth, db, storage, noteID, { name }));
 			} else {
 				setNoteName(note.name);
 			}
@@ -81,7 +91,7 @@ function Editor({ note, noteID, content }) {
 		if (t.length > 0 && t.length <= 256 && t !== note.tags.join(" ")) {
 			setTagString(t);
 			setTags(tags);
-			modifyNoteMetadata(auth, db, storage, noteID, { tags });
+			SM.add(modifyNoteMetadata(auth, db, storage, noteID, { tags }));
 		} else {
 			setTagString(note.tags.join(" "));
 			setTags(note.tags);
@@ -91,11 +101,11 @@ function Editor({ note, noteID, content }) {
 	function onEditorChange(editor, data, value) {
 		lastEdited.callback = function () {
 			const t = value;
-			modifyNoteContent(auth, db, storage, noteID, {
+			SM.add(modifyNoteContent(auth, db, storage, noteID, {
 				publicAccess: note.publicAccess
-			}, t);
+			}, t));
 		};
-		lastEdited.reset().resume();		
+		lastEdited.reset().resume();
 		setEditorText(value);
 	}
 
@@ -138,7 +148,7 @@ function Editor({ note, noteID, content }) {
 				<div className="note-editor">
 					<CodeMirror
 						value={editorText}
-						options={{							
+						options={{
 							readOnly: !editAccess,
 							...CodeMirrorOptions
 						}}
@@ -158,13 +168,13 @@ function ContentLoader({ note, noteID }) {
 	const storage = useStorage();
 
 	const { data: url } = useStorageDownloadURL(ref(storage, `${note.author}/${noteID}.md`));
-	
+
 	const [content, setContent] = useState(null);
-	
+
 	if (url) {
 		const xhr = new XMLHttpRequest();
 		xhr.responseType = "text";
-		xhr.onload = (event) => {
+		xhr.onload = () => {
 			setContent(xhr.response);
 		};
 		xhr.open("GET", url);
