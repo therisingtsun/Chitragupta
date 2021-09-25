@@ -8,7 +8,7 @@ import "highlight.js/styles/github-dark-dimmed.css";
 
 import "./index.scss";
 
-import Merit from "../MarkdownChitragupta";
+import Merit from "../Marked";
 
 marked.use({
 	extensions: [

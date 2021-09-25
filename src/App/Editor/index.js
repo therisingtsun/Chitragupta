@@ -1,12 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 
 import { Controlled as CodeMirror } from "react-codemirror2";
-import "codemirror/addon/selection/active-line";
-import "codemirror/keymap/sublime";
 
-import "./MarkdownChitragupta";
-import "./CodeMirror/base.css";
-import "./CodeMirror/theme-dark.css";
+import "./CodeMirror";
 import CodeMirrorOptions from "./CodeMirror/options";
 
 import {

@@ -1,6 +1,5 @@
 import {
 	GoogleAuthProvider,
-	getRedirectResult,
 	signInWithRedirect,
 } from "firebase/auth";
 import {
@@ -16,7 +15,6 @@ import {
 import {
 	ref,
 	uploadString,
-	updateMetadata,
 	deleteObject
 } from "firebase/storage";
 

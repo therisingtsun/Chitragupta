@@ -134,7 +134,7 @@ function Note({ note }) {
 			setNoteName(n);
 		}
 	}
-	async function onBlur(e) {
+	function onBlur(e) {
 		const name = e.target.value.trim();
 		if (name.length > 0 && name.length < 256 && name !== note.name) {
 			setNoteName(name);
