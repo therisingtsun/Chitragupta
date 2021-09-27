@@ -32,7 +32,7 @@ export async function postSignIn(auth, db, storage, user) {
 		setDoc(userRef, {
 			tier: "free"
 		});
-		createNote(auth, db, storage, {
+		return createNote(auth, db, storage, {
 			name: "Getting started",
 			tags: ["tutorial", "guide", "this-is-a-long-tag-as-an-example"],
 		}, GettingStarted(user.displayName));
@@ -53,7 +53,7 @@ export async function createNote(auth, db, storage, noteData, content = "") {
 		const note = await addDoc(collection(db, "notes"), data);
 
 		if (typeof content === "string") {
-			uploadNote(auth, db, storage, note.id, data, content);
+			await uploadNote(auth, db, storage, note.id, data, content);
 		}
 
 		return [

@@ -1,3 +1,12 @@
+.welcome-screen {
+	position: fixed;
+	top: 0; left: 0; right: 0; bottom: 0;
+	display: flex;
+	flex-flow: column nowrap;
+	align-items: center;
+	justify-content: center;
+}
+
 .user-actions {
 	display: flex;
 	flex-flow: row nowrap;
@@ -5,14 +14,21 @@
 	justify-content: space-between;
 }
 
+.sort-buttons {
+	a {
+		border: none;
+		opacity: 0.5;
+	}
+}
+
 .notes-listing {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, 18rem);
-	grid-auto-rows: 8rem;
 	grid-gap: 1rem;
 	justify-content: center;
 	padding: 1rem;
 	margin: 2rem;
+	margin-top: 0;
 
 	.note-card {
 		--card-border-radius: 6px;
@@ -24,7 +40,6 @@
 		border-radius: var(--card-border-radius);
 		box-shadow: 0.25rem 0.25rem 0.25rem var(--f-dark);
 		width: 18rem;
-		height: 8rem;
 		padding: 1rem;
 	
 		display: inline-flex;
@@ -65,7 +80,7 @@
 				justify-content: flex-end;
 				
 				flex-grow: 1;
-				opacity: 0.25;
+				opacity: 0.3;
 			}
 		}
 	
@@ -86,6 +101,16 @@
 			.delete-link {
 				margin-left: 0.25rem;
 				text-align: right;
+			}
+		}
+
+		.note-modified {
+			text-align: right;
+			opacity: 0.3;
+			padding-top: 0.5rem;
+
+			time {
+				padding-left: 0;
 			}
 		}
 

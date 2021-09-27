@@ -35,8 +35,10 @@ export default function StatusProvider({ children }) {
 		add(task) {
 			let id = v4();
 			while (tasks.hasOwnProperty(id)) id = v4();
+			console.log(task);
 			tasks[id] = new Promise((r, j) => {
 				task.then(() => {
+					console.log(task);
 					delete tasks[id];
 					setTasks({...tasks});
 				});

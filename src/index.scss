@@ -37,6 +37,10 @@ body {
 	font-family: var(--f-content);
 
 	margin: 0;
+
+	#root {
+		padding: 0 2rem;
+	}
 }
 
 a {

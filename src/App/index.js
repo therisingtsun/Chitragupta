@@ -30,58 +30,83 @@ import Loader from "./Utils/Loader";
 
 import Popup from 'reactjs-popup';
 
+import TimeAgo from "javascript-time-ago";
+import en from "javascript-time-ago/locale/en";
+import ReactTimeAgo from "react-time-ago";
+
 import "./index.scss";
 import LoadingMessage from "./loading-messages";
 import Editor from "./Editor";
 import StatusProvider, { useStatus } from "./Utils/StatusIndicator";
 
+TimeAgo.addDefaultLocale(en);
+
 function NewNotePopup() {
 	const auth = useAuth();
 	const db = useFirestore();
 	const storage = useStorage();
+	const SM = useStatus();
 
-	const add = () => createNote(auth, db, storage, { name: noteName });
+	function add() {
+		const p = createNote(auth, db, storage, { name: noteName });
+		SM.add(p);
+		return p;
+	}
 	const [noteName, setNoteName] = useState("New Note");
 
 	function onChange(e) {
 		const n = e.target.value;
-		if (n.length <= 256) {
-			setNoteName(n);
-		}
+		setNoteName(n);
 	}
 	function onBlur(e) {
 		const n = e.target.value.trim();
-		setNoteName(n);
+		if (n.length <= 256) {
+			setNoteName(n);
+		} else setNoteName(noteName);
 	}
+
+	const [working, setWorking] = useState(false);
 
 	return (
 		<Popup trigger={
 			<Link to="/" className="create-link">
 				<MI className="--mr" icon="library_add" /> Note
 			</Link>
-		} modal>
+		} modal className={working ? "--working" : ""}>
 			{close => (
-				<div className="popup-modal">
-					<p>
-						Name for new note:
-					</p>
-					<input
-						className="create-input"
-						value={noteName}
-						onChange={onChange}
-						onBlur={onBlur}
-					/>
-					<p className="confirm-para">
-						<Link to="/" onClick={() => {
-							add();
-							close();
-						}} className="confirm-link create-confirm-link">
-							Create
-						</Link>
-						<Link to="/" onClick={close}>
-							Cancel
-						</Link>
-					</p>
+				<div className="popup-modal">{working
+					? <>
+						<p>
+							Working…
+						</p>
+					</> 
+					: <>
+						<p>
+							Name for new note:
+						</p>
+						<input
+							maxLength="256"
+							className="create-input"
+							value={noteName}
+							onChange={onChange}
+							onBlur={onBlur}
+						/>
+						<p className="confirm-para">
+							<Link to="/" onClick={() => {
+								setWorking(true);
+								add().then(() => {
+									setWorking(false);
+									close();
+								});
+							}} className="confirm-link create-confirm-link">
+								Create
+							</Link>
+							<Link to="/" onClick={close}>
+								Cancel
+							</Link>
+						</p>
+					</>
+				}
 				</div>
 			)}
 		</Popup>
@@ -158,6 +183,9 @@ function Note({ note }) {
 				</Link>
 				<DeleteNotePopup note={note} />
 			</div>
+			<div className="note-modified">Last modified {note.modified &&
+				<ReactTimeAgo date={new Date(note.modified.seconds * 1000)} locale="en-US"/>
+			}</div>
 		</div>
 	);
 }
@@ -166,10 +194,13 @@ function NotesListing() {
 	const auth = useAuth();
 	const db = useFirestore();
 
+	const [sort, setSort] = useState(localStorage.getItem("chitragupta-notes-listing-sort") ?? "modified");
+	const [sortDir, setSortDir] = useState(localStorage.getItem("chitragupta-notes-listing-sort-direction") ?? "desc");
+
 	const { status, data: notes, error } = useFirestoreCollectionData(query(
 		collection(db, "notes"),
 		where("author", "==", auth.currentUser.uid),
-		orderBy("modified", "desc")
+		orderBy(sort, sortDir)
 	), {
 		idField: "id"
 	});
@@ -177,9 +208,27 @@ function NotesListing() {
 	switch (status) {
 		case "success": {
 			return notes.length
-				? <div className="notes-listing">{
-					notes.map(n => <Note key={n.id} note={n} />)
-				}</div>
+				? <>
+					<div className="sort-buttons">
+						<Link to="/" onClick={() => {
+							const changed = sort === "name" ? "modified" : "name";
+							localStorage.setItem("chitragupta-notes-listing-sort", changed);
+							setSort(changed);
+						}}>
+							<MI icon={sort === "name" ? "sort_by_alpha" : "schedule"} />
+						</Link>
+						<Link to="/" onClick={() => {
+							const changed = sortDir === "asc" ? "desc" : "asc";
+							localStorage.setItem("chitragupta-notes-listing-sort-direction", changed);
+							setSortDir(changed);
+						}}>
+							<MI icon={sortDir === "asc" ? "keyboard_double_arrow_up" : "keyboard_double_arrow_down"} />
+						</Link>
+					</div>
+					<div className="notes-listing">{
+						notes.map(n => <Note key={n.id} note={n} />)
+					}</div>
+				</>
 				: <div className="notes-message">
 					<p> No notes ;-; </p>
 					<p> Create one? </p>
@@ -205,8 +254,8 @@ function SignIn() {
 	const auth = useAuth();
 
 	return (
-		<>
-			<h1> Welcome! </h1>
+		<div className="welcome-screen">
+			<h1> Welcome to Chitragupta </h1>
 			<Link 
 				to="/signin"
 				className="sign-in-button"
@@ -214,7 +263,7 @@ function SignIn() {
 			>
 				Sign In with Google
 			</Link>
-		</>
+		</div>
 	);
 }
 
@@ -278,14 +327,17 @@ function App() {
 			return <SignIn />;
 		} else {
 			return (<>
-				<h1 className="user-notes-title">
-					{user.displayName}'s Notes:
+				<h1 className="app-title">
+					Chitragupta
 				</h1>
-				<div className="user-actions">
-					<NewNotePopup />
-					<SignOut />
-				</div>
+				<h2 className="user-notes-title">
+					{user.displayName}'s Notes:
+				</h2>
 				<StatusProvider>
+					<div className="user-actions">
+						<NewNotePopup />
+						<SignOut />
+					</div>
 					<NotesListing />
 				</StatusProvider>
 			</>);
