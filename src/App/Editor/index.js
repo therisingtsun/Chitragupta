@@ -2,6 +2,9 @@ import React, { useState, useRef, useEffect } from "react";
 
 import { Controlled as CodeMirror } from "react-codemirror2";
 
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 import "./CodeMirror";
 import CodeMirrorOptions from "./CodeMirror/options";
 
@@ -120,6 +123,7 @@ function Editor({ note, noteID, content }) {
 	} else
 		return (
 			<div className="note-view">
+				<ToastContainer />
 				<div className="note-header">
 					<input
 						maxLength="256"

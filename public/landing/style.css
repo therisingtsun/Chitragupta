@@ -1,0 +1,239 @@
+@font-face {
+    font-family: 'MakLight';
+    src: url('./Font/MAK.eot'); /* IE9 Compat Modes */
+    src: url('./Font/MAK.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('./Font/MAK.woff') format('woff'), /* Modern Browsers */
+         url('./Font/') format('truetype'); /* Safari, Android, iOS */
+             font-style: normal;
+    font-weight: normal;
+    text-rendering: optimizeLegibility;
+}
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+html,
+body {
+	width: 100%;
+	height: 100vh;
+	overflow: hidden;
+}
+
+.container {
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background: #1A1A1A;
+	font-family: "MakLight";
+	pointer-events: none;
+}
+
+.cursor{
+	position: fixed;
+	width: 3rem;
+	height: 3rem;
+	border: 1px solid #C7C7C7;
+	border-radius: 50%;
+	left: 50%;
+	top: -50%;
+	pointer-events: none;
+	transform: translate(-50%, -50%);
+	transition: all 0.1s ease-out;
+	animation: cursorAnim 1.5s infinite alternate;
+	animation-timing-function: ease-in-out;
+}
+
+@keyframes cursorAnim {
+	from {
+		transform: scale(1.5);
+	}
+	to {
+		transform: scale(1);
+	}
+}
+
+.cursor2 {
+	position: fixed;
+	width: 0.75rem;
+	height: 0.75rem;
+	background-color: #d3d3d3;
+	border-radius: 50%;
+	left: 50%;
+	top: -50%;
+	pointer-events: none;
+	transform: translate(-50%, -50%);
+	transition: all 0.15s;
+}
+
+.container:hover ~ .cursor{
+	transform: translate(-50%, -50%) scale(1.5);
+	background-color: #C7C7C7;
+	opacity: .3;
+}
+
+.container:hover ~ .cursor2{
+	opacity: .5;
+}
+
+.blocks {
+	display: flex;
+	font-size: 8vw;
+	color: #C7C7C7;
+	user-select: none;
+}
+
+.circle-shape-thicc {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 800px;
+	height: 800px;
+	border: 1px solid rgba(199, 199, 199, 0.3);
+	border-radius: 100%;
+
+}
+
+.circle-shape {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 800px;
+	height: 800px;
+	border: 1px solid rgba(199, 199, 199, 0.4);
+	border-radius: 100%;
+	filter: blur(4px);
+	animation: glowBreathing 1.5s infinite alternate;
+	animation-timing-function: ease-in-out;
+}
+
+@keyframes glowBreathing {
+	from{
+		filter: blur(4px);
+		border: 1px solid rgba(199, 199, 199, 0.4);
+	}
+	to{
+		filter: blur(4px);
+		border: 2px solid rgb(230, 230, 230);
+	}
+}
+
+.circle-shape-2 {
+	position: fixed;
+	top: 64%;
+	left: 80%;
+	transform: translate(-50%, -50%);
+	width: 240px;
+	height: 240px;
+	background: #21272C;
+	border-radius: 100%;
+	animation: shapeAnime 1.5s infinite alternate;
+	animation-timing-function: ease-in-out;
+}
+
+.circle-shape-3 {
+	position: fixed;
+	top: 30%;
+	left: 20%;
+	transform: translate(-50%, -50%);
+	width: 140px;
+	height: 140px;
+	background: #4444FF;
+	border-radius: 100%;
+	z-index: 2;
+	animation: shapeAnime2 2s infinite alternate;
+	animation-timing-function: ease-in-out;
+}
+
+@keyframes shapeAnime {
+	from{
+		top: 64%;
+	}
+	to{
+		top: 70%;
+	}
+}
+
+@keyframes shapeAnime2 {
+	from{
+		top: 30%;
+	}
+	to{
+		top: 40%;
+	}
+}
+
+.wrapper-img {
+	overflow: hidden;
+	position: fixed;
+	top: 35% !important;
+	right: 18%;
+	width: 30%;
+	height: 90vh;
+	user-select: none;
+}
+
+img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.box {
+	background: #1A1A1A;
+	opacity: 1;
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	right: 0;
+	left: 0;
+	z-index: 0;
+}
+
+.site-logo {
+	position: fixed;
+	left: 50%;
+	transform: translateX(-50%);
+	font-family: "MakLight";
+	font-size: 30px;
+	line-height: 100px;
+	text-transform: uppercase;
+	color: #C7C7C7;
+}
+
+.navbar {
+	position: fixed;
+	top: 0;
+	width: 100%;
+	height: 100px;
+	padding: 0 40px;
+	display: flex;
+	justify-content: space-between;
+	font-family: Arial, Helvetica, sans-serif !important;
+	text-transform: uppercase;
+	line-height: 100px;
+	color: #C7C7C7;
+	transition: all 0.15s ease-out;
+}
+
+.site-menu {
+	display: flex;
+}
+
+a {
+	color: #C7C7C7;
+	text-decoration: none;
+}
+
+@media (max-width: 900px) {
+	.navbar {
+		top: 3rem;
+	}
+}

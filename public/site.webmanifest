@@ -1,0 +1,20 @@
+{
+	"name": "Chitragupta",
+	"description": "An app for taking notes. Made with ❤️ for DevLok 2021.",
+	"short_name": "chitragupta",
+	"theme_color": "#0099ff",
+	"background_color": "#1d1f20",
+	"display": "standalone",
+	"icons": [
+		{
+			"src": "media/android-chrome-192x192.png",
+			"sizes": "192x192",
+			"type": "image/png"
+		},
+		{
+			"src": "media/android-chrome-512x512.png",
+			"sizes": "512x512",
+			"type": "image/png"
+		}
+	]
+}

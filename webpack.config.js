@@ -12,9 +12,10 @@ module.exports = (env) => {
 	const plugins = [
 		new HtmlWebpackPlugin({
 			template: path.resolve(__dirname, "./src/views/index.html"),
+			filename: "../index.html"
 		}),
 		new MiniCssExtractPlugin({
-			filename: "main.bundle.css"
+			filename: "../styles/main.bundle.css"
 		})
 	];
 
@@ -35,7 +36,7 @@ module.exports = (env) => {
 			}
 		},
 		output: {
-			path: path.resolve(__dirname, "public/"),
+			path: path.resolve(__dirname, "public/scripts/"),
 			filename: "[name].bundle.js",
 			chunkFilename: "[name].bundle.js",
 		},

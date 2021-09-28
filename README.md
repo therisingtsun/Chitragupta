@@ -8,9 +8,9 @@ Built on React and Firebase.
 
 Contributors:
 
-- [@Risabhrai](https://github.com/Risabhrai)
-- [@ROG-stdioh](https://github.com/ROG-stdioh/)
-- [@therisingtsun](https://github.com/therisingtsun)
+- [@Risabhrai](https://github.com/Risabhrai) - The Editor, using [CodeMirror](https://codemirror.net/).
+- [@ROG-stdioh](https://github.com/ROG-stdioh/) - The Landing Page ([Repo](https://github.com/ROG-stdioh/Chitagupta---Landing)).
+- [@therisingtsun](https://github.com/therisingtsun) - Handling Firebase and React communication.
 
 # Pre-requisites
 
@@ -19,7 +19,6 @@ Contributors:
 # Installation
 
 - `npm i` : Install dependencies.
-- `firebase login` : Login to Firebase.
 
 # Running
 

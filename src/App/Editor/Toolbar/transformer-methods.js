@@ -54,7 +54,7 @@ export const checkIfFormatted = (prevLen, postLen) => {
 };
 
 export const modifyPostTransformCursorPos = (mod, formatted) => {
-	return mod * (formatted ? 1 : -1);
+	return mod * (formatted ? -1 : 1);
 };
 
 export const cursorPlacementForWordTransform = (

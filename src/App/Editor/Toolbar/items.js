@@ -2,6 +2,8 @@ import ClipboardJS from "clipboard";
 
 import { lineTransformer, wordTransformer } from "./transformer-methods";
 
+import { toast } from "react-toastify";
+
 function CMCommandRunner(editor, fn) {
 	fn(editor);
 }
@@ -138,13 +140,14 @@ export default [
 	},
 
 	{
-		title: "Share", icon: "share", runner: (_, fn) => fn(),
+		title: "Share Note", icon: "share", runner: (_, fn) => fn(),
 		action() {
 			const b = document.createElement("button");
 			new ClipboardJS(b, {
 				text: () => window.location.href
 			});
 			b.click();
+			toast.success("Share URL copied to clipboard!");
 		}
 	},
 ];

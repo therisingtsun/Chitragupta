@@ -34,19 +34,18 @@ export default function StatusProvider({ children }) {
 		tasks,
 		add(task) {
 			let id = v4();
-			while (tasks.hasOwnProperty(id)) id = v4();
-			console.log(task);
-			tasks[id] = new Promise((r, j) => {
+			const _t = this.tasks;
+			while (_t.hasOwnProperty(id)) id = v4();
+			_t[id] = new Promise((r, j) => {
 				task.then(() => {
-					console.log(task);
-					delete tasks[id];
-					setTasks({...tasks});
+					delete _t[id];
+					setTasks({..._t});
 				});
 			});
-			setTasks({...tasks});
+			setTasks({..._t});
 		},
 		synced() {
-			return Object.values(tasks).length === 0;
+			return Object.values(this.tasks).length === 0;
 		}
 	}
 	

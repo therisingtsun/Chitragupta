@@ -1,6 +1,10 @@
 # Custom
 .design
-public
+
+public/scripts
+public/styles
+public/index.html
+
 firebase-keys.env
 *.bat
 cors.json

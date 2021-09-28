@@ -1,4 +1,5 @@
 export default function GettingStarted(name) {
+	name = name || "internet person";
 	return [
 		`# Welcome to Chitragupta`,
 		`Hello ${name}! Welcome to your new note taking app.`,
