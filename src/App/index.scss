@@ -1,166 +1,190 @@
 .welcome-screen {
-	position: fixed;
-	top: 0; left: 0; right: 0; bottom: 0;
-	display: flex;
-	flex-flow: column nowrap;
-	align-items: center;
-	justify-content: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    justify-content: center;
+}
+
+.app-title {
+    text-transform: uppercase;
+    color: #09f;
+    letter-spacing: 0.25rem;
 }
 
 .user-actions {
-	display: flex;
-	flex-flow: row nowrap;
-	align-items: center;
-	justify-content: space-between;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .sort-buttons {
-	a {
-		border: none;
-		opacity: 0.5;
-	}
+    a {
+        border: none;
+        opacity: 0.5;
+
+        i {
+            font-size: 1.5rem;
+        }
+    }
 }
 
 .notes-listing {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, 18rem);
-	grid-gap: 1rem;
-	justify-content: center;
-	padding: 1rem;
-	margin: 2rem;
-	margin-top: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 18rem);
+    grid-gap: 1rem;
+    justify-content: center;
+    padding: 1rem;
+    margin: 2rem;
+    margin-top: 0;
 
-	.note-card {
-		--card-border-radius: 6px;
-		--card-tag-border-radius: 12px;
-	
-		color: var(--f);
-		background-color: var(--bg);
-		border: 2px solid var(--bg-l);
-		border-radius: var(--card-border-radius);
-		box-shadow: 0.25rem 0.25rem 0.25rem var(--f-dark);
-		width: 18rem;
-		padding: 1rem;
-	
-		display: inline-flex;
-		flex-flow: column nowrap;
-		justify-content: space-between;
-	
-		transition: all 0.1s ease;
-		
-		user-select: none;
-	
-		> * > * {
-			padding: 0.25rem 0.5rem;
-		}
-	
-		.note-info {
-			display: flex;
-			flex-flow: row nowrap;
-			align-items: center;
-			justify-content: space-between;
-	
-			.note-name {
-				padding: 0 0.25rem;
-				white-space: nowrap;
-				overflow: hidden;
-				text-overflow: ellipsis;
-				width: 60%;
-				font-size: 1.25rem;
-				background-color: transparent;
-				color: var(--f);
-				border: none;
-				border-bottom: 2px solid var(--f);
-			}
-		
-			.visibility-icon {
-				display: flex;
-				flex-flow: row nowrap;
-				align-items: center;
-				justify-content: flex-end;
-				
-				flex-grow: 1;
-				opacity: 0.3;
-			}
-		}
-	
-		.note-operations {
-			display: flex;
-			flex-flow: row nowrap;
-			align-items: center;
-			justify-content: space-between;
-	
-			> * {
-				width: 100%;
-			}
-	
-			.edit-link {
-				margin-right: 0.25rem;
-			}
-			
-			.delete-link {
-				margin-left: 0.25rem;
-				text-align: right;
-			}
-		}
+    .note-card {
+        --card-border-radius: 6px;
+        --card-tag-border-radius: 12px;
 
-		.note-modified {
-			text-align: right;
-			opacity: 0.3;
-			padding-top: 0.5rem;
+        color: var(--f);
+        background-color: var(--bg);
+        border: 2px solid var(--bg-l);
+        border-radius: var(--card-border-radius);
+        box-shadow: 0.25rem 0.25rem 0.25rem var(--f-dark);
+        width: 18rem;
+        padding: 0.5rem;
+        display: inline-flex;
+        flex-flow: column nowrap;
+        justify-content: space-between;
 
-			time {
-				padding-left: 0;
-			}
-		}
+        transition: all 0.1s ease;
 
-		&:hover {
-			background-color: var(--bg-l);
-		}
-	}
+        user-select: none;
+
+        > * > * {
+            padding: 0.25rem 0.5rem;
+        }
+
+        .note-info {
+            display: flex;
+            flex-flow: row nowrap;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 0.25rem;
+
+            .note-name {
+                padding: 0.5rem 0rem;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                width: 90%;
+                font-size: 1.25rem;
+                background-color: transparent;
+                color: var(--f);
+                border: none;
+                border-bottom: 2px solid var(--f);
+            }
+
+            .visibility-icon {
+                display: flex;
+                flex-flow: row nowrap;
+                align-items: center;
+                justify-content: flex-start;
+
+                padding: 0rem;
+                flex-grow: 1;
+                opacity: 0.3;
+
+                color: #09f;
+
+                > i {
+                    font-size: 1.5rem;
+                }
+            }
+        }
+
+        .note-operations {
+            display: flex;
+            flex-flow: row nowrap;
+            align-items: center;
+            justify-content: space-between;
+            margin: 1rem 0rem 0.25rem 0rem;
+
+            > * {
+                width: 100%;
+            }
+            > a {
+                i {
+                    margin-right: 0.5rem;
+                }
+            }
+            .edit-link {
+                margin-right: 0.25rem;
+            }
+
+            .delete-link {
+                margin-left: 0.25rem;
+            }
+        }
+
+        .note-modified {
+            text-align: right;
+            opacity: 0.3;
+            padding-top: 0.25rem;
+
+            time {
+                padding-left: 0;
+            }
+        }
+
+        &:hover {
+            background-color: var(--bg-l);
+        }
+    }
 }
 
 .notes-message {
-	padding: 2rem;
-	margin: 2rem;
-	text-align: center;
+    padding: 2rem;
+    margin: 2rem;
+    text-align: center;
 }
 
 .popup-overlay {
-	background-color: rgba(0, 0, 0, 0.8);
-	
-	.popup-content {
-		.popup-modal {
-			background-color: var(--bg-d);
-			border: 2px solid var(--f);
-			border-radius: var(--base-border-radius);
-			padding: 2rem;
-			font-size: 1.5rem;
+    background-color: rgba(0, 0, 0, 0.8);
 
-			.confirm-para {
-				text-align: center;
-				margin-top: 4rem;
-				display: flex;
-				flex-flow: row nowrap;
-				align-items: center;
-				justify-content: space-evenly;
+    .popup-content {
+        .popup-modal {
+            background-color: var(--bg-d);
+            border: 2px solid var(--f);
+            border-radius: var(--base-border-radius);
+            padding: 2rem;
+            font-size: 1.5rem;
 
-				a {
-					padding: 0.5rem 1rem;
-				}
+            .confirm-para {
+                text-align: center;
+                margin-top: 4rem;
+                display: flex;
+                flex-flow: row nowrap;
+                align-items: center;
+                justify-content: space-evenly;
 
-				.delete-confirm-link {
-					&:hover {
-						background-color: var(--aD);
-					}
-				}
+                a {
+                    padding: 0.5rem 1rem;
+                }
 
-				.create-confirm-link {
-					&:hover {
-						background-color: var(--aS);
-					}
-				}
-			}
-		}
-	}
+                .delete-confirm-link {
+                    &:hover {
+                        background-color: var(--aD);
+                    }
+                }
+
+                .create-confirm-link {
+                    &:hover {
+                        background-color: var(--aS);
+                    }
+                }
+            }
+        }
+    }
 }
