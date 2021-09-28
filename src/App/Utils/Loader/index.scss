@@ -16,6 +16,7 @@
 		text-transform: uppercase;
 		color: var(--f);
 		animation: loader-breathe 2s ease infinite;
+		margin: 0.5rem;
 	}
 
 	@keyframes loader-breathe {

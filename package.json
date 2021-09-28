@@ -2,10 +2,8 @@
 	"scripts": {
 		"build": "npm run clean && webpack --env production",
 		"clean": "rimraf public/*",
-		"dev": "concurrently --kill-others \"webpack\" \"npm run serve\"",
-		"dev:fb": "concurrently --kill-others \"webpack\" \"firebase emulators:start\" \"npm run serve:fb\" \"webpack --stats --json=webpack.stats.json\"",
-		"serve": "browser-sync public --watch --single --port 3000",
-		"serve:fb": "browser-sync start --watch --files public --port 3000 --proxy localhost:5000",
+		"dev": "concurrently --kill-others \"webpack\" \"firebase emulators:start\" \"npm run serve\" \"webpack --stats --json=webpack.stats.json\"",
+		"serve": "browser-sync start --watch --files public --port 3000 --proxy localhost:5000",
 		"postinstall": "npm run build"
 	},
 	"name": "chitragupta",
@@ -39,9 +37,9 @@
 		"babel-loader": "^8.2.2",
 		"browser-sync": "^2.27.5",
 		"concurrently": "^6.2.1",
-		"copy-webpack-plugin": "^9.0.1",
 		"css-loader": "^6.2.0",
 		"cssnano": "^5.0.8",
+		"dotenv-webpack": "^7.0.3",
 		"firebase-tools": "^9.18.0",
 		"html-webpack-plugin": "^5.3.2",
 		"mini-css-extract-plugin": "^2.3.0",
@@ -52,7 +50,6 @@
 		"sass-loader": "^12.1.0",
 		"style-loader": "^3.2.1",
 		"webpack": "^5.52.1",
-		"webpack-cli": "^4.8.0",
-		"webpack-dev-server": "^4.2.1"
+		"webpack-cli": "^4.8.0"
 	}
 }

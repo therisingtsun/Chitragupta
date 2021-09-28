@@ -1,5 +1,6 @@
 {
 	"hosting": {
+		"site": "chitragupta",
 		"public": "public",
 		"ignore": [
 			"firebase.json",

@@ -1,4 +1,5 @@
 import {
+	GithubAuthProvider,
 	GoogleAuthProvider,
 	signInWithRedirect,
 } from "firebase/auth";
@@ -22,6 +23,11 @@ import GettingStarted from "./getting-started";
 
 export function signInWithGoogle(auth) {
 	const provider = new GoogleAuthProvider();
+	return signInWithRedirect(auth, provider);
+}
+
+export function signInWithGitHub(auth) {
+	const provider = new GithubAuthProvider();
 	return signInWithRedirect(auth, provider);
 }
 

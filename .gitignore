@@ -1,6 +1,9 @@
 # Custom
 .design
 public
+firebase-keys.env
+*.bat
+cors.json
 
 webpack.stats.json
 

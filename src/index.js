@@ -25,11 +25,11 @@ function FirebaseApp() {
 	const db = getFirestore(app);
 	const storage = getStorage(app);
 
-	// if (process.env.NODE_ENV !== "production") {
+	if (process.env.NODE_ENV !== "production") {
 		connectAuthEmulator(auth, "http://localhost:9099");
 		connectFirestoreEmulator(db, "localhost", 8080);
 		connectStorageEmulator(storage, "localhost", 9199);
-	// }
+	}
 
 	return (
 		<AuthProvider sdk={auth}>
@@ -45,7 +45,7 @@ function FirebaseApp() {
 }
 
 render(
-	<FirebaseAppProvider firebaseConfig={firebaseConfig}>
+	<FirebaseAppProvider firebaseConfig={firebaseConfig()}>
 		<FirebaseApp />
 	</FirebaseAppProvider>,
 	document.getElementById("root")

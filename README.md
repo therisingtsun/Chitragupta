@@ -1,6 +1,10 @@
 # Chitragupta
 
-A note taking app. Built on React and Firebase.
+A note taking app.
+
+Made for [DevLok](https://devlok.netlify.app/).
+
+Built on React and Firebase.
 
 Contributors:
 
@@ -19,5 +23,4 @@ Contributors:
 
 # Running
 
-- `npm run dev` : Build and launch app on localhost.
-- `npm run dev:fb` : Build and launch app on localhost with Firebase emulators.
+- `npm run dev` : Build and launch app on localhost with Firebase emulators.
