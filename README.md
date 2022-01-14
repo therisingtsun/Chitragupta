@@ -2,12 +2,11 @@
 
 A note taking app.
 
-Made for [DevLok](https://devlok.netlify.app/).
-
 Built on React and Firebase.
 
 Contributors:
 
+- [@dheeraj120501](https://github.com/dheeraj120501) - Database schema and logic.
 - [@Risabhrai](https://github.com/Risabhrai) - The Editor, using [CodeMirror](https://codemirror.net/).
 - [@ROG-stdioh](https://github.com/ROG-stdioh/) - The Landing Page ([Repo](https://github.com/ROG-stdioh/Chitagupta---Landing)).
 - [@therisingtsun](https://github.com/therisingtsun) - Handling Firebase and React communication.
