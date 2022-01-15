@@ -18,7 +18,7 @@
 		"firebase": "^9.0.2",
 		"highlight.js": "^11.2.0",
 		"javascript-time-ago": "^2.3.9",
-		"marked": "^3.0.3",
+		"marked": "^4.0.10",
 		"preact": "^10.5.14",
 		"react-codemirror2": "^7.2.1",
 		"react-router-dom": "^5.3.0",
