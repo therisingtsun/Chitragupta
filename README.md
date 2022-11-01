@@ -4,15 +4,6 @@ A note taking app.
 
 Built on React and Firebase.
 
-Contributors:
-
-- [@ajp1-cmyk](https://github.com/ajp1-cmyk) - User Experience design and testing.
-- [@champslayer](https://github.com/champslayer) - Frontend work with React.
-- [@dheeraj120501](https://github.com/dheeraj120501) - Database schema and logic.
-- [@Holytheif](https://github.com/holytheif) - The Editor, using [CodeMirror](https://codemirror.net/).
-- [@ROG-stdioh](https://github.com/ROG-stdioh/) - The Landing Page ([Repo](https://github.com/ROG-stdioh/Chitagupta---Landing)).
-- [@therisingtsun](https://github.com/therisingtsun) - Handling Firebase and React communication.
-
 # Pre-requisites
 
 - NodeJS : Install from [here](https://nodejs.org/en/).
